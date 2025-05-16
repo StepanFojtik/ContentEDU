@@ -1,2 +1,2 @@
 # ContentEDU
-School project for 'Data Project'
+School project for 'Data Project' subject
