@@ -5,3 +5,5 @@ faiss-cpu
 pymupdf
 docx
 chromadb
+langchain-comunity
+tiktoken
