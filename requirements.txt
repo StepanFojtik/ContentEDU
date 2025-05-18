@@ -5,3 +5,7 @@ PyMuPDF
 numpy
 pandas
 python-dotenv
+FlagEmbedding
+pdfplumber
+loguru
+torch  # potrebné pre BGEM3FlagModel
