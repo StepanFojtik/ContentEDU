@@ -1,0 +1,7 @@
+gradio
+langchain
+openai
+faiss-cpu
+pymupdf
+docx
+chromadb

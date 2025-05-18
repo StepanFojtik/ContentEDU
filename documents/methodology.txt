@@ -1,0 +1,65 @@
+
+🧾 METODOLOGIE PRO TVORBU ONLINE KURZŮ V MOODLE PRO UNIVERZITNÍ VÝUKU
+
+1. STRUKTURA KURZU
+Každý kurz by měl být rozdělen do tematických týdnů nebo modulů, které odpovídají osnově výuky. Každý týden/modul musí obsahovat:
+- Název tématu
+- Cíle výuky
+- Výukové materiály (texty, prezentace, videa, odkazy)
+- Studijní úkoly nebo testy
+- Fórum nebo jiný interaktivní prvek
+
+2. ÚVODNÍ SEKCE
+Na začátku kurzu by měla být umístěna sekce s následujícím obsahem:
+- Přivítání studentů
+- Název kurzu a stručný popis
+- Kontaktní údaje vyučujícího
+- Cíle kurzu
+- Požadavky k absolvování
+- Doporučená literatura
+- Harmonogram výuky
+
+3. TYPY STUDIJNÍCH MATERIÁLŮ
+Kurz by měl využívat různé formy studijních materiálů:
+- PDF/textové soubory pro čtení
+- Video přednášky (vložení přes YouTube/Vimeo nebo nahrání přímo)
+- Prezentace ve formátu PowerPoint nebo PDF
+- Odkazy na externí zdroje
+
+4. AKTIVIZACE STUDENTA
+Pro zajištění aktivního zapojení studentů by kurz měl obsahovat:
+- Diskuzní fóra na konci každého tématu
+- Samotestovací kvízy (nehodnocené)
+- Průběžné úkoly
+- Projekty nebo eseje
+
+5. HODNOCENÍ A ZPĚTNÁ VAZBA
+Každý kurz by měl mít jasně definovaný systém hodnocení, který může obsahovat:
+- Automaticky hodnocené testy
+- Ručně hodnocené úkoly
+- Závěrečný test nebo projekt
+- Možnost studentova sebehodnocení
+- Možnost komentářů a zpětné vazby od učitele
+
+6. ZPŘÍSTUPNĚNÍ A DOSTUPNOST
+- Každá část kurzu by měla být zpřístupněna v určitém týdnu, ale zároveň by měl být celý kurz dostupný pro studium s předstihem.
+- Všechny soubory by měly být dostupné ve formátech přístupných i na mobilních zařízeních.
+- Používej popisky pro multimediální obsah (např. titulky u videí).
+
+7. JAZYK A STYL
+- Používej formální, ale srozumitelný jazyk.
+- Krátké odstavce, seznamy, zvýraznění důležitého obsahu.
+- Zohledni cílovou skupinu (bakalářské/magisterské/PhD studium).
+
+8. ZÁVĚREČNÁ SEKCE KURZU
+Na konci kurzu by měla být:
+- Shrnutí a zopakování klíčových bodů
+- Závěrečný test nebo projekt
+- Zpětná vazba od studentů (formulář nebo fórum)
+- Informace o navazujících kurzech nebo doporučených tématech
+
+9. TECHNICKÉ DOPORUČENÍ
+- Používej standardizované názvy souborů a sekcí
+- Vyvaruj se příliš velkým souborům (>50MB)
+- Pravidelně zálohuj obsah kurzu
+- Testuj kurz z pohledu studenta
