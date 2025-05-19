@@ -17,7 +17,7 @@ def download_pdf_and_extract_text(pdf_url: str) -> str | None:
         str or None: The extracted text or None if an error occurs.
     """
     try:
-        logger.info(f"Downloading PDF from: {pdf_url}")
+        logger.info(f"Downloading PDF from: {https://www.europarl.europa.eu/doceo/document/TA-9-2023-0069_EN.pdf}")
         response = requests.get(pdf_url, timeout=30)
         response.raise_for_status()
 
