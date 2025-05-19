@@ -31,3 +31,9 @@ Projekt vznikl jako součást týmové práce na univerzitě (tým Byte Me) k p�
 ```bash
 git clone https://github.com/StepanFojtik/ContentEDU.git
 cd contentEDU
+
+2. Nainstaluj závislosti
+pip install -r requirements.txt
+
+3. Spusť
+XYXY
