@@ -29,5 +29,5 @@ Projekt vznikl jako součást týmové práce na univerzitě (tým Byte Me) k p�
 1. Klonuj repozitář:
 
 ```bash
-git clone https://github.com/uzivatelka/contentEDU.git
+git clone https://github.com/StepanFojtik/ContentEDU.git
 cd contentEDU
