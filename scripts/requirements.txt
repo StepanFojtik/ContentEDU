@@ -1,0 +1,30 @@
+# PDF zpracování
+pdfplumber
+requests
+
+# Embeddingy
+FlagEmbedding
+torch
+numpy
+
+# Vektorová databáze
+chromadb
+
+# Logging
+loguru
+
+# LLM a fine-tuning (Unsloth)
+unsloth
+transformers
+sentencepiece
+protobuf
+datasets
+trl
+huggingface_hub
+hf_transfer
+
+# Volitelně pro prostředí Colab (komentováno)
+# bitsandbytes
+# accelerate
+# xformers==0.0.29.post3
+# triton
