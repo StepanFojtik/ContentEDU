@@ -1,14 +1,14 @@
 # main.py
 
-from scripts.pdf_utils import download_pdf_and_extract_text
-from scripts.embedding_utils import load_and_chunk_pdf, initialize_bge_model, generate_embeddings
-from scripts.chroma_utils import (
+from pdf_utils import download_pdf_and_extract_text
+from embedding_utils import load_and_chunk_pdf, initialize_bge_model, generate_embeddings
+from chroma_utils import (
     setup_chromadb_collection,
     store_in_chromadb,
     get_chromadb_collection,
     query_chromadb
 )
-from scripts.rag_pipeline import (
+from rag_pipeline import (
     initialize_llm_and_tokenizer,
     retrieve_documents,
     generate_response_with_llm
