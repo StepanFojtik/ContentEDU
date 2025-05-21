@@ -1,23 +1,25 @@
 # scripts/rag_pipeline.py
 
 from loguru import logger
-from transformers import AutoTokenizer, AutoModelForCausalLM, TextStreamer
+from unsloth import FastLanguageModel
+from unsloth.chat_templates import get_chat_template
+from transformers import TextStreamer
 
 
-def initialize_llm_and_tokenizer(
-    model_name="google/gemma-2b",  # změněno na kompatibilní CPU model
-    max_seq_length=2048,
-    load_in_4bit=False,
-    load_in_8bit=False,
-):
+def initialize_llm_and_tokenizer(model_name="unsloth/gemma-3-4b-it", max_seq_length=65536, load_in_4bit=True, load_in_8bit=False, chat_template="gemma-3"):
     """
-    Initializes a HuggingFace Transformer model and tokenizer.
+    Initializes the Unsloth FastLanguageModel and tokenizer with specified parameters.
     """
     logger.info(f"Loading LLM model: {model_name}")
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForCausalLM.from_pretrained(model_name)
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name=model_name,
+        max_seq_length=max_seq_length,
+        load_in_4bit=load_in_4bit,
+        load_in_8bit=load_in_8bit,
+    )
 
-    logger.info("LLM and tokenizer loaded successfully.")
+    logger.info("LLM loaded. Applying chat template...")
+    tokenizer = get_chat_template(tokenizer, chat_template=chat_template)
     return model, tokenizer
 
 
@@ -51,22 +53,35 @@ def generate_response_with_llm(llm_model, tokenizer, query, context_docs, max_ne
     """
     logger.info("Generating response from LLM...")
     context_str = "\n\n".join(context_docs)
+    messages = [
+        {
+            "role": "system",
+            "content": [{
+                "type": "text",
+                "text": (
+                    "You are a helpful assistant. Answer the user's question based ONLY on the provided context. "
+                    "If the context doesn't contain the answer, say that the information is not available."
+                )
+            }]
+        },
+        {
+            "role": "user",
+            "content": [{
+                "type": "text",
+                "text": f"Based on the following context:\n\n---\n{context_str}\n---\n\nAnswer this question: {query}"
+            }]
+        }
+    ]
 
-    prompt = (
-        "You are a helpful assistant. Answer the user's question based ONLY on the provided context. "
-        "If the context doesn't contain the answer, say that the information is not available.\n\n"
-        f"Context:\n---\n{context_str}\n---\n\n"
-        f"Question: {query}\nAnswer:"
-    )
-
-    inputs = tokenizer(prompt, return_tensors="pt")
-    streamer = TextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
+    input_text = tokenizer.apply_chat_template(messages, add_generation_prompt=True)
 
     _ = llm_model.generate(
-        **inputs,
+        **tokenizer([input_text], return_tensors="pt").to("cuda"),
         max_new_tokens=max_new_tokens,
         temperature=1.0,
         top_p=0.95,
         top_k=64,
-        streamer=streamer
+        streamer=TextStreamer(tokenizer, skip_prompt=True),
     )
+
+
