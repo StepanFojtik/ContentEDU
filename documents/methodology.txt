@@ -1,65 +1,57 @@
+### Metodologie pro tvorbu detailního online kurzu pomocí AI
 
-🧾 METODOLOGIE PRO TVORBU ONLINE KURZŮ V MOODLE PRO UNIVERZITNÍ VÝUKU
+#### 5. Struktura generovaného obsahu (podrobný popis):
 
-1. STRUKTURA KURZU
-Každý kurz by měl být rozdělen do tematických týdnů nebo modulů, které odpovídají osnově výuky. Každý týden/modul musí obsahovat:
-- Název tématu
-- Cíle výuky
-- Výukové materiály (texty, prezentace, videa, odkazy)
-- Studijní úkoly nebo testy
-- Fórum nebo jiný interaktivní prvek
+Každý generovaný kurz musí obsahovat jasně definovanou, detailní strukturu, která studentům zajistí kvalitní vzdělávací zážitek a umožní jim plně porozumět probíranému tématu:
 
-2. ÚVODNÍ SEKCE
-Na začátku kurzu by měla být umístěna sekce s následujícím obsahem:
-- Přivítání studentů
-- Název kurzu a stručný popis
-- Kontaktní údaje vyučujícího
-- Cíle kurzu
-- Požadavky k absolvování
-- Doporučená literatura
-- Harmonogram výuky
+**Úvod do kurzu:**
 
-3. TYPY STUDIJNÍCH MATERIÁLŮ
-Kurz by měl využívat různé formy studijních materiálů:
-- PDF/textové soubory pro čtení
-- Video přednášky (vložení přes YouTube/Vimeo nebo nahrání přímo)
-- Prezentace ve formátu PowerPoint nebo PDF
-- Odkazy na externí zdroje
+* Jasný a přehledný úvod zahrnující cíle kurzu, očekávané znalosti a kompetence, kterých studenti dosáhnou.
+* Shrnutí obsahu, klíčových témat a důležitost tématu v širším kontextu.
+* Stručné představení struktury a průběhu kurzu.
 
-4. AKTIVIZACE STUDENTA
-Pro zajištění aktivního zapojení studentů by kurz měl obsahovat:
-- Diskuzní fóra na konci každého tématu
-- Samotestovací kvízy (nehodnocené)
-- Průběžné úkoly
-- Projekty nebo eseje
+**Moduly a lekce:**
 
-5. HODNOCENÍ A ZPĚTNÁ VAZBA
-Každý kurz by měl mít jasně definovaný systém hodnocení, který může obsahovat:
-- Automaticky hodnocené testy
-- Ručně hodnocené úkoly
-- Závěrečný test nebo projekt
-- Možnost studentova sebehodnocení
-- Možnost komentářů a zpětné vazby od učitele
+Každý modul je rozdělen na lekce, z nichž každá musí obsahovat:
 
-6. ZPŘÍSTUPNĚNÍ A DOSTUPNOST
-- Každá část kurzu by měla být zpřístupněna v určitém týdnu, ale zároveň by měl být celý kurz dostupný pro studium s předstihem.
-- Všechny soubory by měly být dostupné ve formátech přístupných i na mobilních zařízeních.
-- Používej popisky pro multimediální obsah (např. titulky u videí).
+* **Detailní teoretický výklad:**
 
-7. JAZYK A STYL
-- Používej formální, ale srozumitelný jazyk.
-- Krátké odstavce, seznamy, zvýraznění důležitého obsahu.
-- Zohledni cílovou skupinu (bakalářské/magisterské/PhD studium).
+  * Přesné a detailní definice klíčových pojmů.
+  * Srozumitelná vysvětlení složitých konceptů s důrazem na pedagogickou vhodnost.
+  * Logická návaznost informací umožňující snadné pochopení a zapamatování.
+  * Citace a odkazy na původní dokumenty (PDF) pro hlubší porozumění a validaci informací.
 
-8. ZÁVĚREČNÁ SEKCE KURZU
-Na konci kurzu by měla být:
-- Shrnutí a zopakování klíčových bodů
-- Závěrečný test nebo projekt
-- Zpětná vazba od studentů (formulář nebo fórum)
-- Informace o navazujících kurzech nebo doporučených tématech
+* **Příklady z praxe a aplikace:**
 
-9. TECHNICKÉ DOPORUČENÍ
-- Používej standardizované názvy souborů a sekcí
-- Vyvaruj se příliš velkým souborům (>50MB)
-- Pravidelně zálohuj obsah kurzu
-- Testuj kurz z pohledu studenta
+  * Konkrétní, realistické příklady aplikace teorie v praxi.
+  * Analýza případových studií, které pomohou studentům lépe pochopit teoretické koncepty.
+  * Přehledné ilustrace, schémata či grafy, pokud jsou relevantní.
+
+* **Interaktivní kontrolní otázky:**
+
+  * Otázky k okamžitému ověření pochopení výkladu (krátké otevřené otázky, doplňovací otázky, otázky typu multiple-choice).
+  * Zpětná vazba ke každé odpovědi vysvětlující správnou odpověď či objasňující časté chyby.
+
+* **Praktická cvičení:**
+
+  * Samostatné nebo skupinové aktivity k prohloubení pochopení látky.
+  * Jasné instrukce, včetně cílů, očekávaného výstupu a doporučeného času pro řešení.
+  * Možnost kontroly řešení pomocí vzorových odpovědí nebo automatizovaných zpětných vazeb.
+
+* **Doporučené zdroje:**
+
+  * Výběr dalších relevantních zdrojů (články, videa, knihy) umožňující studentům rozšířit své znalosti nad rámec kurzu.
+
+**Shrnutí a revize:**
+
+* Komplexní shrnutí hlavních bodů každého modulu.
+* Znovu zdůraznění klíčových pojmů a jejich propojení.
+* Stručné revizní otázky, které studentům pomohou upevnit získané znalosti.
+
+**Testovací a evaluační materiály:**
+
+* Závěrečné testy, kvízy nebo úkoly zaměřené na ověření celkového pochopení probírané látky.
+* Detailní klíče řešení s vysvětlením každé správné odpovědi.
+* Evaluační kritéria umožňující jasné posouzení znalostí a pokroku studenta.
+
+Tato detailní struktura zajistí, že studenti získají komplexní, konzistentní a kvalitní vzdělání s minimální nutností dodatečných manuálních zásahů učitele.
