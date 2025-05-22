@@ -1,4 +1,4 @@
-import os
+import os 
 import gradio as gr
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -10,10 +10,9 @@ from langchain_community.chat_models import ChatOpenAI
 from docx import Document
 
 VECTOR_DB_PATH = "vectorstore"
-API_KEY = ""
+API_KEY = "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"
 conversation_history = []
 
-# Funkce pro načítání dokumentů
 def load_documents(paths):
     docs = []
     for path in paths:
@@ -21,7 +20,6 @@ def load_documents(paths):
         docs.extend(loader.load())
     return docs
 
-# Vytvoření vektorové databáze
 def create_vector_db(docs):
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     splits = splitter.split_documents(docs)
@@ -29,33 +27,47 @@ def create_vector_db(docs):
     vectorstore = Chroma.from_documents(splits, embeddings, persist_directory=VECTOR_DB_PATH)
     vectorstore.persist()
 
-# Získání retrieveru
 def get_retriever():
     embeddings = OpenAIEmbeddings(openai_api_key=API_KEY)
     vectorstore = Chroma(persist_directory=VECTOR_DB_PATH, embedding_function=embeddings)
     return vectorstore.as_retriever(search_type="mmr", search_kwargs={"k":12})
 
-# Vygenerování promptu
-def generate_prompt(course_title, methodology, additional_info):
-    return f"""
-    Název kurzu: {course_title}
-    Metodologie podle které máš kurz vytvořit:
-    {methodology}
-
-    Další specifikace: {additional_info or "Bez dalších informací."}
-
-    Vytvoř precizní a strukturovaný kurz pro Moodle s jasnou hierarchií modulů, sekcí a lekcí.
-    Každá lekce musí obsahovat teorii, definice, příklady a praktické aplikace.
-    """
-
-# Vytvoření obsahu kurzu přes RetrievalQA chain
-def create_course_content(prompt, retriever):
+def generate_course_outline(course_title, methodology, additional_info):
     llm = ChatOpenAI(openai_api_key=API_KEY, model="gpt-3.5-turbo")
-    chain = RetrievalQA.from_chain_type(llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
-    result = chain(prompt)
-    return result['result'], result['source_documents']
+    outline_prompt = f"""
+    Název kurzu: {course_title}
+    Metodologie: {methodology}
+    Specifikace: {additional_info or "Bez dalších informací."}
 
-# Export do Wordu
+    Vytvoř pouze osnovu kurzu – jasnou hierarchii modulů, sekcí a lekcí.
+    Nepiš zatím žádný obsah lekcí, jen názvy a strukturu.
+    """
+    response = llm.predict(outline_prompt)
+    return response
+
+def generate_lesson_contents(outline, retriever):
+    llm = ChatOpenAI(openai_api_key=API_KEY, model="gpt-3.5-turbo")
+    course_with_content = ""
+    for line in outline.split("\n"):
+        stripped_line = line.strip()
+        if not stripped_line or stripped_line.lower().startswith("název"):
+            course_with_content += line + "\n"
+            continue
+        
+        relevant_docs = retriever.get_relevant_documents(stripped_line)
+        context = "\n".join([doc.page_content for doc in relevant_docs])
+
+        content_prompt = f"""
+        Na základě následující osnovy: "{stripped_line}"
+        a relevantního kontextu z dokumentů:
+        {context}
+
+        Vytvoř obsah této kapitoly kurzu – včetně teorie, definic, příkladů a praktických aplikací.
+        """
+        lesson_content = llm.predict(content_prompt)
+        course_with_content += f"{line}\n{lesson_content}\n\n"
+    return course_with_content
+
 def export_to_word(content, filename="generated_course.docx"):
     doc = Document()
     doc.add_heading("Vygenerovaný kurz", 0)
@@ -63,7 +75,6 @@ def export_to_word(content, filename="generated_course.docx"):
     doc.save(filename)
     return filename
 
-# Export do HTML
 def export_to_html(content, filename="generated_course.html"):
     html_content = f"""<!DOCTYPE html>
 <html lang='cs'>
@@ -80,7 +91,6 @@ def export_to_html(content, filename="generated_course.html"):
         f.write(html_content)
     return filename
 
-# Proces
 def process(pdf_files, syllabus_file, course_title, additional_info):
     docs = load_documents([f.name for f in pdf_files] + [syllabus_file.name, "documents/methodology.txt"])
     create_vector_db(docs)
@@ -89,15 +99,12 @@ def process(pdf_files, syllabus_file, course_title, additional_info):
     with open("documents/methodology.txt", "r", encoding="utf-8") as file:
         methodology = file.read()
 
-    prompt = generate_prompt(course_title, methodology, additional_info)
-    course_content, source_docs = create_course_content(prompt, retriever)
-    context = "\n---\n".join([doc.page_content for doc in source_docs])
+    course_outline = generate_course_outline(course_title, methodology, additional_info)
+    full_course = generate_lesson_contents(course_outline, retriever)
 
-    conversation_history.append({"dotaz": prompt, "odpoved": course_content})
+    conversation_history.append({"dotaz": course_outline, "odpoved": full_course})
+    return full_course, course_outline, conversation_history
 
-    return course_content, context, conversation_history
-
-# Refinement funkce
 def refine_course(feedback):
     if not conversation_history:
         return "Nejdříve vytvoř kurz.", conversation_history
@@ -105,7 +112,8 @@ def refine_course(feedback):
     last_response = conversation_history[-1]['odpoved']
     new_prompt = f"Uprav předchozí obsah kurzu na základě připomínky uživatele:\n\n{feedback}\n\nPůvodní obsah:\n{last_response}"
     retriever = get_retriever()
-    refined_content, _ = create_course_content(new_prompt, retriever)
+    llm = ChatOpenAI(openai_api_key=API_KEY, model="gpt-3.5-turbo")
+    refined_content = llm.predict(new_prompt)
 
     conversation_history.append({"dotaz": feedback, "odpoved": refined_content})
     return refined_content, conversation_history
@@ -123,7 +131,7 @@ with gr.Blocks() as iface:
 
     generate_btn = gr.Button("Generovat kurz")
     course_output = gr.TextArea(label="Vygenerovaný obsah kurzu")
-    context_output = gr.TextArea(label="Výstup z vektorové databáze")
+    context_output = gr.TextArea(label="Struktura kurzu (osnova)")
 
     export_btn = gr.Button("Exportovat do Wordu")
     export_output = gr.File(label="Stáhnout kurz (DOCX)")
