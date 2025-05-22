@@ -1,0 +1,27 @@
+#Sensitive API keys
+.env
+
+#Python virtual environments (Anaconda, venv, etc.)
+venv/
+env/
+.venv/
+
+#Vector database artifacts (Chroma)
+vectorstore/
+
+#Uploaded course files
+data/courses/
+
+#Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# 🧠 Language model logs or temporary files (if any)
+*.log
+
+# ⚙️ VS Code editor settings
+.vscode/
+
+# 📄 macOS metadata
+.DS_Store

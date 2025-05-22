@@ -1,2 +1,0 @@
-user_id,course_id,course_name,goal,file_path,prompt,response,timestamp,exported
-u_5041c11c,course_721dbf9c,AI Basics,Teach foundations of AI,data/courses/ai_course.pdf,Create week 1,Week 1: Introduction to AI...,2025-05-15T17:29:53.939322,False

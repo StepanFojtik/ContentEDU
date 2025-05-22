@@ -1,2 +1,6 @@
 pre rozbehnutie streamlit:
-KMP_DUPLICATE_LIB_OK=TRUE python -m streamlit run interface/streamlit_app.py
+/opt/anaconda3/envs/contentedu/bin/streamlit run UI/streamlit_app.py
+
+pre stahovanie:
+/opt/anaconda3/envs/contentedu/bin/pip install -r requirements.txt
+

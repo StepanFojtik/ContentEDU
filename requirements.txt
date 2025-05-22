@@ -1,11 +1,10 @@
 streamlit
-openai
-sentence-transformers
-PyMuPDF
-numpy
-pandas
-python-dotenv
-FlagEmbedding
 pdfplumber
-loguru
-torch  # potrebné pre BGEM3FlagModel
+chromadb
+langchain
+langchain-community
+langchain-openai
+openai
+tiktoken
+numpy
+python-dotenv
