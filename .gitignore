@@ -17,7 +17,7 @@ __pycache__/
 *.py[cod]
 *.pyo
 
-# 🧠 Language model logs or temporary files (if any)
+# Language model logs or temporary files (if any)
 *.log
 
 # ⚙️ VS Code editor settings
