@@ -1,0 +1,34 @@
+**4. Conclusion**
+
+This section provides information about how the course ends – including the form of the final exam or project – and offers space for student feedback.
+
+Apply the same approach as in the Introduction:
+
+- Use provided information with the note:
+  _(Information was sourced from the provided syllabus. Please review and complete as needed.)_
+
+- If key information is missing, mention it explicitly.
+- If no input is available, generate a placeholder with this message:
+  _(This section is mandatory and should include information on course completion, the final exam or project, and a space for feedback.)_
+
+---
+**Formatting**
+
+- Use Markdown headers:
+  - `# Course Title`
+  - `## Module X – Title`
+- Use bullet points for lists
+- Maintain a consistent tone and style
+- Avoid time-specific phrases like “this year” or “recently”
+
+---
+
+**Constraints**
+
+- Use only the provided materials – do not invent facts
+- Do not include implementation comments, system notes, or motivational messages
+- Keep each module self-contained and standalone
+- For module quizzes, ensure that questions only test content from the corresponding module
+- The introductory quiz may include general questions covering topics from across all modules
+
+---

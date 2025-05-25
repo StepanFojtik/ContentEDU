@@ -5,165 +5,161 @@
 # └── requirements.txt
 
 # ------------------ main.py -------------------
+# main.py
 import os
-# --- Nastavení API klíče ---
-os.environ["OPENAI_API_KEY"] = ""  # <--- ZDE vlož platný klíč
-import gradio as gr
-from langchain_community.document_loaders import PyMuPDFLoader
+import streamlit as st
+import pdfplumber
+from typing import List, Dict
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import Chroma
-from docx import Document
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
+from langchain_core.documents import Document
+from langchain_core.messages import HumanMessage
+from docx import Document as WordDocument
+from dotenv import load_dotenv
 
+load_dotenv()
+
+API_KEY = os.getenv("OPENAI_API_KEY")
 VECTOR_DB_PATH = "vectorstore"
-conversation_history = []
+CHUNK_SIZE = 1000
+CHUNK_OVERLAP = 100
 
-def load_documents(paths):
-    docs = []
-    for path in paths:
-        loader = PyMuPDFLoader(path)
-        docs.extend(loader.load())
-    return docs
+st.set_page_config(page_title="Course Generator", layout="wide")
 
-def create_vector_db(docs):
-    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    splits = splitter.split_documents(docs)
-    embeddings = OpenAIEmbeddings()
-    vectorstore = Chroma.from_documents(splits, embeddings, persist_directory=VECTOR_DB_PATH)
+# ================== FUNKCE ==================
+def extract_text_from_pdf(pdf_file) -> str:
+    with pdfplumber.open(pdf_file) as pdf:
+        return "\n".join([page.extract_text() or "" for page in pdf.pages])
+
+def split_into_chunks(text: str) -> List[Document]:
+    splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
+    return splitter.create_documents([text])
+
+def embed_and_store_chunks(docs: List[Document]):
+    embeddings = OpenAIEmbeddings(openai_api_key=API_KEY)
+    vectorstore = Chroma.from_documents(docs, embeddings, persist_directory=VECTOR_DB_PATH)
     vectorstore.persist()
 
-def get_retriever():
-    embeddings = OpenAIEmbeddings()
+def retrieve_relevant_context(query: str, k: int = 5) -> str:
+    embeddings = OpenAIEmbeddings(openai_api_key=API_KEY)
     vectorstore = Chroma(persist_directory=VECTOR_DB_PATH, embedding_function=embeddings)
-    return vectorstore.as_retriever(search_type="mmr", search_kwargs={"k": 12})
+    retriever = vectorstore.as_retriever(search_kwargs={"k": k})
+    docs = retriever.get_relevant_documents(query)
+    return "\n".join([doc.page_content for doc in docs])
 
-def generate_course_outline(course_title, methodology, additional_info):
-    llm = ChatOpenAI(model="gpt-3.5-turbo")
-    prompt = f"""
-    Vytvoř osnovu kurzu s názvem "{course_title}" na základě této metodiky:
+def load_methodology(name: str) -> str:
+    path = f"methodology-{name.lower()}.txt"
+    with open(path, "r", encoding="utf-8") as file:
+        return file.read()
 
-    {methodology}
+def generate_prompt(context: str, methodology: str, title: str, extra: str = "") -> str:
+    return f"""
+{methodology}
 
-    Doplňující informace: {additional_info or "Bez dalších požadavků."}
+---
 
-    Osnova by měla obsahovat konkrétní názvy modulů a kapitol (žádné "Modul 1"), uveď hierarchii a strukturu výuky.
-    """
+**Course Name**: {title}
+{f"**Additional Info**: {extra}\n" if extra else ""}
+**Relevant Teaching Content**:
+{context}
+
+---
+Generate the response strictly based on the methodology and provided content.
+"""
+
+def call_gpt(prompt: str, model: str = "gpt-4") -> str:
+    llm = ChatOpenAI(model=model, openai_api_key=API_KEY)
     return llm.predict(prompt)
 
-def generate_lesson_contents(outline, retriever):
-    llm = ChatOpenAI(model="gpt-3.5-turbo")
-    full_course = ""
-    full_context = ""
+def generate_course_structure(course_title: str, syllabus: str, extra: str = "") -> Dict:
+    context = retrieve_relevant_context(syllabus)
+    methodology = load_methodology("structure")
+    prompt = generate_prompt(context, methodology, course_title, extra)
+    response = call_gpt(prompt, model="gpt-4")
+    return {"structure": response, "context": context}
 
-    for line in outline.split("\n"):
-        stripped = line.strip()
-        if not stripped or stripped.lower().startswith("název"):
-            full_course += line + "\n"
-            continue
+def generate_full_course(structure: str, course_title: str) -> str:
+    blocks = ["announcements", "introduction", "conclusion", "quiz"]
+    content = []
 
-        relevant_docs = retriever.get_relevant_documents(stripped)
-        context = "\n".join(doc.page_content for doc in relevant_docs)
-        full_context += f"\n--- {stripped} ---\n{context}\n"
+    for part in blocks:
+        context = retrieve_relevant_context(course_title)
+        methodology = load_methodology(part)
+        prompt = generate_prompt(context, methodology, course_title)
+        section = call_gpt(prompt, model="gpt-3.5-turbo")
+        content.append(section)
 
-        prompt = f"""
-        Téma kapitoly: {stripped}
+    modules = [line for line in structure.split("\n") if line.lower().startswith("module")]
+    for module_line in modules:
+        module_name = module_line.strip()
+        context = retrieve_relevant_context(module_name)
+        methodology = load_methodology("modules")
+        prompt = generate_prompt(context, methodology, module_name)
+        module_content = call_gpt(prompt, model="gpt-3.5-turbo")
+        content.append(f"\n## {module_name}\n{module_content}")
 
-        Na základě následujícího kontextu z dokumentů:
+    return "\n\n".join(content)
 
-        {context}
+def export_to_word(text: str) -> bytes:
+    doc = WordDocument()
+    for para in text.split("\n"):
+        doc.add_paragraph(para)
+    from io import BytesIO
+    buffer = BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+    return buffer.read()
 
-        Vytvoř ucelený obsah této kapitoly pro univerzitní kurz. Zaměř se na:
-        - teoretický výklad
-        - definice
-        - příklady
-        - praktické aplikace
+def export_to_html(text: str) -> str:
+    return "<html><body>" + "<br>".join(text.split("\n")) + "</body></html>"
 
-        Použij výukový styl, který je vhodný pro studium.
-        """
-        content = llm.predict(prompt)
-        full_course += f"{line}\n{content}\n\n"
+# ================== UI ==================
+st.title("📚 Moodle Course Generator")
+st.markdown("Generuj kurzy na základě PDF a metodiky.")
 
-    return full_course, full_context
+if "structure" not in st.session_state:
+    st.session_state.structure = None
+if "context" not in st.session_state:
+    st.session_state.context = None
+if "course" not in st.session_state:
+    st.session_state.course = None
 
-def export_to_word(content, filename="generated_course.docx"):
-    doc = Document()
-    doc.add_heading("Vygenerovaný kurz", 0)
-    doc.add_paragraph(content)
-    doc.save(filename)
-    return filename
+uploaded_pdfs = st.file_uploader("Nahrát PDF materiály", type="pdf", accept_multiple_files=True)
+syllabus_file = st.file_uploader("Nahrát PDF sylabus", type="pdf")
+course_title = st.text_input("Název kurzu")
+extra_info = st.text_area("Doplňující info (nepovinné)")
 
-def export_to_html(content, filename="generated_course.html"):
-    html_content = f"""<!DOCTYPE html>
-<html lang='cs'>
-<head>
-    <meta charset='UTF-8'>
-    <title>Vygenerovaný kurz</title>
-</head>
-<body>
-    <h1>Vygenerovaný kurz</h1>
-    <pre>{content}</pre>
-</body>
-</html>"""
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(html_content)
-    return filename
+if st.button("🔍 Vygeneruj strukturu kurzu") and uploaded_pdfs and syllabus_file and course_title:
+    full_text = "\n\n".join([extract_text_from_pdf(pdf) for pdf in uploaded_pdfs])
+    chunks = split_into_chunks(full_text)
+    embed_and_store_chunks(chunks)
 
-def process(pdf_files, syllabus_file, course_title, additional_info):
-    all_files = [f.name for f in pdf_files] + [syllabus_file.name, "documents/methodology.txt"]
-    docs = load_documents(all_files)
-    create_vector_db(docs)
-    retriever = get_retriever()
+    syllabus_text = extract_text_from_pdf(syllabus_file)
+    result = generate_course_structure(course_title, syllabus_text, extra_info)
+    st.session_state.structure = result["structure"]
+    st.session_state.context = result["context"]
 
-    with open("documents/methodology.txt", "r", encoding="utf-8") as file:
-        methodology = file.read()
+if st.session_state.structure:
+    st.subheader("📑 Návrh struktury kurzu")
+    edited = st.text_area("Návrh", st.session_state.structure, height=300)
+    if st.button("✅ Potvrdit a vytvořit obsah"):
+        st.session_state.course = generate_full_course(edited, course_title)
 
-    course_outline = generate_course_outline(course_title, methodology, additional_info)
-    full_course, full_context = generate_lesson_contents(course_outline, retriever)
+if st.session_state.course:
+    st.subheader("📘 Generovaný kurz")
+    st.markdown(st.session_state.course)
 
-    conversation_history.append({"dotaz": course_outline, "odpoved": full_course})
-    return full_course, full_context, conversation_history
+    col1, col2 = st.columns(2)
+    with col1:
+        st.download_button("⬇️ Stáhnout jako Word", export_to_word(st.session_state.course), file_name="course.docx")
+    with col2:
+        st.download_button("⬇️ Stáhnout jako HTML", export_to_html(st.session_state.course), file_name="course.html", mime="text/html")
 
-def refine_course(feedback):
-    if not conversation_history:
-        return "Nejdříve vytvoř kurz.", conversation_history
-
-    last_response = conversation_history[-1]['odpoved']
-    llm = ChatOpenAI(model="gpt-3.5-turbo")
-    new_prompt = f"Uprav následující obsah kurzu na základě připomínek:\n{feedback}\n\nPůvodní obsah:\n{last_response}"
-    refined_content = llm.predict(new_prompt)
-
-    conversation_history.append({"dotaz": feedback, "odpoved": refined_content})
-    return refined_content, conversation_history
-
-# --- Gradio UI ---
-with gr.Blocks() as iface:
-    gr.Markdown("# 🧠 Generátor Moodle kurzů")
-
-    with gr.Row():
-        pdf_files = gr.File(label="PDF dokumenty", file_count="multiple")
-        syllabus_file = gr.File(label="Sylabus (PDF)")
-
-    course_title = gr.Textbox(label="Název kurzu")
-    additional_info = gr.Textbox(label="Doplňující info (nepovinné)")
-
-    generate_btn = gr.Button("Vygenerovat kurz")
-    course_output = gr.TextArea(label="📘 Vygenerovaný obsah kurzu")
-    context_output = gr.TextArea(label="🔍 Použitý kontext z dokumentů")
-
-    export_btn = gr.Button("Export do Wordu")
-    export_output = gr.File(label="Stáhnout Word (DOCX)")
-
-    export_html_btn = gr.Button("Export do HTML")
-    export_html_output = gr.File(label="Stáhnout HTML")
-
-    feedback = gr.Textbox(label="Připomínky")
-    refine_btn = gr.Button("Upravit podle připomínek")
-    conversation_display = gr.JSON(label="Historie")
-
-    generate_btn.click(process, [pdf_files, syllabus_file, course_title, additional_info],
-                       [course_output, context_output, conversation_display])
-    export_btn.click(lambda content: export_to_word(content), inputs=course_output, outputs=export_output)
-    export_html_btn.click(lambda content: export_to_html(content), inputs=course_output, outputs=export_html_output)
-    refine_btn.click(refine_course, inputs=feedback, outputs=[course_output, conversation_display])
-
-iface.launch()
+    st.subheader("💬 Připomínky")
+    feedback = st.text_area("Co se ti nelíbí?")
+    if st.button("♻️ Přegenerovat podle připomínek") and feedback:
+        prompt = f"{st.session_state.context}\n\nUživatelská připomínka: {feedback}\n\nPůvodní návrh:\n{st.session_state.course}"
+        st.session_state.course = call_gpt(prompt, model="gpt-3.5-turbo")

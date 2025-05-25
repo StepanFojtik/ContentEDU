@@ -1,10 +1,10 @@
-gradio
-langchain
+streamlit
 openai
-faiss-cpu
-pymupdf
-docx
+dotenv
+pdfplumber
+langchain
+langchain-community
+langchain-openai
 chromadb
-langchain-comunity
-tiktoken
+docx
 python-docx

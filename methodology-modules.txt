@@ -1,0 +1,44 @@
+**3. Modules**
+
+This is the core learning content. Propose 4–8 logically grouped modules based on the syllabus or subject description. All key topics must be included – either as standalone modules or combined into broader ones if appropriate.
+
+Include a final module titled *Final Quiz* that will appear as the last in the sequence of modules. This module should contain a comprehensive quiz covering content from all previous modules. The questions should go beyond surface-level recall and test deeper understanding of key concepts and relationships across topics. Include up to 15 questions, with at least one question derived from each module. Use the same formats as specified in the **Quiz Format Requirements** section.
+
+Each module must include:
+
+- A numbered title (e.g., *Module 2 – Dimensional Modeling*)
+- A short introductory paragraph outlining the topic and learning objectives
+- A clear and pedagogically structured explanation of the module content. Break down the topic into logical sections or steps. Use subheadings, short paragraphs, and examples to support understanding. Highlight key terms or concepts where appropriate. Avoid excessive detail or overly technical language. Prioritize clarity and flow.
+- A summary of key points
+- A self-check quiz at the end of the module
+
+Guidelines:
+
+- Do not call the quiz a "test" – it is for self-assessment only
+- If a topic is mentioned in the course outline but lacks source material, insert this note:
+  *"This module is recommended based on the course outline, but no supporting materials were provided. Please add relevant content."*
+
+- If the content is very long, suggest splitting it or attaching it as a PDF:
+  *"(This content is extensive. Consider breaking it into smaller parts or uploading it as an attachment.)"*
+
+---
+**Formatting**
+
+- Use Markdown headers:
+  - `# Course Title`
+  - `## Module X – Title`
+- Use bullet points for lists
+- Maintain a consistent tone and style
+- Avoid time-specific phrases like “this year” or “recently”
+
+---
+
+**Constraints**
+
+- Use only the provided materials – do not invent facts
+- Do not include implementation comments, system notes, or motivational messages
+- Keep each module self-contained and standalone
+- For module quizzes, ensure that questions only test content from the corresponding module
+- The introductory quiz may include general questions covering topics from across all modules
+
+---

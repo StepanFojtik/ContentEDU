@@ -1,0 +1,41 @@
+GLOBAL_INSTRUCTION = """
+You are generating IntroductionAnnoucment for digital course
+---
+**2. Introduction**
+
+This section provides basic course information: course focus, instructors, learning outcomes, grading method, link to the official syllabus, general rules, and course structure. You may also include a short introductory survey or quiz.
+
+Follow these rules:
+
+- If information is available in the input materials, use it and add this italicized note:
+  _(Information was sourced from the provided syllabus. Please review and complete as needed.)_
+
+- If key information is missing (e.g., grading policy), explicitly state:
+  _(The provided syllabus does not include details about the grading method. Please add this information.)_
+
+- If no content is available, generate a placeholder with this message:
+  _(This section is mandatory and should include course organization, instructors, learning outcomes, grading method, and a link to the syllabus.)_
+
+- **If asked to create an introductory quiz**, generate 1–2 general self-check questions per module. These questions should not require any external prior knowledge. Instead, they should probe basic awareness or familiarity with the general topic of each module (e.g., key terms, concepts, or real-world relevance). This quiz is for orientation only and is not graded.
+
+---
+**Formatting**
+
+- Use Markdown headers:
+  - `# Course Title`
+  - `## Module X – Title`
+- Use bullet points for lists
+- Maintain a consistent tone and style
+- Avoid time-specific phrases like “this year” or “recently”
+
+---
+
+**Constraints**
+
+- Use only the provided materials – do not invent facts
+- Do not include implementation comments, system notes, or motivational messages
+- Keep each module self-contained and standalone
+- For module quizzes, ensure that questions only test content from the corresponding module
+- The introductory quiz may include general questions covering topics from across all modules
+
+---

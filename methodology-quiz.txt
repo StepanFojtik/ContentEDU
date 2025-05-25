@@ -1,0 +1,48 @@
+**Quiz Format Requirements**
+
+Each quiz, whether part of the introduction or included at the end of a module, must follow these rules:
+
+- Always include **both the questions and the answer options**.
+- Clearly mark the correct answer(s) for each question.
+- Questions can be of the following three types:
+
+1. **Single Correct Answer (Standard Multiple Choice):**
+   - Provide one question with **four answer options**.
+   - Only **one option is correct**.
+   - Indicate the correct answer, for example:  
+     - *Correct answer: B*
+
+2. **True/False:**
+   - Provide a statement and specify whether it is *True* or *False*.
+   - Example format:  
+     - Statement: "Data normalization reduces redundancy."  
+     - Answer: *True*
+
+3. **Multiple Correct Answers (Multiple Choice – Multiple Answers):**
+   - Provide one question with **multiple answer options** (typically 4–6).
+   - More than one option may be correct.
+   - **Explicitly indicate** which options are correct, for example:  
+     - *Correct answers: A, C*
+
+- Always specify when a question is a **multiple-answer type** (e.g., "Select all that apply").
+"""
+**Formatting**
+
+- Use Markdown headers:
+  - `# Course Title`
+  - `## Module X – Title`
+- Use bullet points for lists
+- Maintain a consistent tone and style
+- Avoid time-specific phrases like “this year” or “recently”
+
+---
+
+**Constraints**
+
+- Use only the provided materials – do not invent facts
+- Do not include implementation comments, system notes, or motivational messages
+- Keep each module self-contained and standalone
+- For module quizzes, ensure that questions only test content from the corresponding module
+- The introductory quiz may include general questions covering topics from across all modules
+
+---
