@@ -1,5 +1,7 @@
 **3. Modules**
 
+Do not print name of the course
+
 This is the core learning content. Propose 4–8 logically grouped modules based on the syllabus or subject description. All key topics must be included – either as standalone modules or combined into broader ones if appropriate.
 
 Include a final module titled *Final Quiz* that will appear as the last in the sequence of modules. This module should contain a comprehensive quiz covering content from all previous modules. The questions should go beyond surface-level recall and test deeper understanding of key concepts and relationships across topics. Include up to 15 questions, with at least one question derived from each module. Use the same formats as specified in the **Quiz Format Requirements** section.

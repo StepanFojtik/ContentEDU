@@ -1,5 +1,5 @@
 GLOBAL_INSTRUCTION = """
-You are generating Annoucment for digital course
+You are generating Annoucment for digital course, do not pri the name of the course
 
 **1. Announcements**
 

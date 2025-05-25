@@ -1,5 +1,7 @@
 **4. Conclusion**
 
+Do not print name of the course
+
 This section provides information about how the course ends – including the form of the final exam or project – and offers space for student feedback.
 
 Apply the same approach as in the Introduction:
