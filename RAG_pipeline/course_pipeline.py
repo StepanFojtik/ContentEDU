@@ -9,6 +9,14 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain_community.chat_models import ChatOpenAI
 from dotenv import load_dotenv
+from langgraph.graph import MessagesState
+from langchain_core.tools import tool
+from langchain_core.messages import HumanMessage
+from langchain_openai.chat_models import ChatOpenAI
+from langgraph.graph import StateGraph, END, START
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.prebuilt import ToolNode
+
 
 # Load environment variables -> our OPENAI_API_KEY
 load_dotenv()
@@ -51,18 +59,26 @@ def load_methodology(path: str = "course_methodics.txt") -> str:
 # 6. Build a prompt to send to the AI model (LLM)
 def generate_prompt(context: str, methodology: str, course_name: str) -> str:
     template = """
-    Course Design Methodology:
-    {methodology}
+{methodology}
 
-    Context from Teaching Materials:
-    {context}
+---
 
-    Course Name: {course_name}
+**Course Name**: {course_name}
 
-    ➔ Based on the above, generate a structured course suitable for Moodle or LMS.
-    """
+**Relevant Extracted Teaching Content**:
+{context}
+
+---
+
+Please generate a complete, structured Moodle course based strictly on the methodology and provided content above. Avoid using external knowledge or adding invented facts.
+"""
     prompt = PromptTemplate.from_template(template)
-    return prompt.format(methodology=methodology, context=context, course_name=course_name)
+    return prompt.format(
+        methodology=methodology.strip(),
+        context=context.strip(),
+        course_name=course_name.strip()
+    )
+
 
 # 7. Send the final prompt to the AI model and get the course content
 def get_course_content(final_prompt: str) -> str:
@@ -70,22 +86,53 @@ def get_course_content(final_prompt: str) -> str:
     chain = LLMChain(llm=llm, prompt=PromptTemplate.from_template("{input}"))
     return chain.run({"input": final_prompt})
 
-# 8. Main pipeline: take multiple teaching material PDFs, extract, embed, and generate content
-def run_full_course_pipeline(material_paths: List[str], syllabus_text: str, course_name: str) -> str:
-    # Combine the text from all teaching material PDFs
-    full_text = "\n\n".join([extract_text_from_pdf(path) for path in material_paths])
 
-    # Break into chunks and embed them
+#8. tools and agent 
+@tool
+def check_course_quality(course_draft: str) -> str:
+    """Reviews the course draft for structure, coherence, and Moodle compliance."""
+    response = ChatOpenAI(model="gpt-4", temperature=0).invoke([
+        HumanMessage(content=f"Please review the following course draft for structure, coherence, and Moodle compliance:\n\n{course_draft}")
+    ])
+    return response.content
+
+def call_model(state: MessagesState):
+    model = ChatOpenAI(model="gpt-4", temperature=0).bind_tools([check_course_quality])
+    return {"messages": [model.invoke(state["messages"])]}
+
+def should_continue(state: MessagesState):
+    last = state["messages"][-1]
+    return "qa_tool" if last.tool_calls else END
+
+def build_qa_graph():
+    graph = StateGraph(MessagesState)
+    graph.add_node("agent", call_model)
+    graph.add_node("qa_tool", ToolNode([check_course_quality]))
+    graph.set_entry_point("agent")
+    graph.add_conditional_edges("agent", should_continue)
+    graph.add_edge("qa_tool", "agent")
+    return graph.compile(checkpointer=MemorySaver())
+
+qa_app = build_qa_graph()
+
+def run_qa_agent(course_draft: str) -> str:
+    result = qa_app.invoke({"messages": [HumanMessage(content=course_draft)]})
+    return result["messages"][-1].content
+
+# === Full Pipeline with QA Integration ===
+
+def run_full_course_pipeline(material_paths: List[str], syllabus_text: str, course_name: str) -> str:
+    full_text = "\n\n".join([extract_text_from_pdf(path) for path in material_paths])
     chunks = split_into_chunks(full_text)
     embed_and_store_chunks(chunks)
 
-    # Find the relevant content and generate the course
     context = retrieve_relevant_context(syllabus_text)
     methodology = load_methodology()
     prompt = generate_prompt(context, methodology, course_name)
-    return get_course_content(prompt)
+    course_draft = get_course_content(prompt)
 
-# 9. Regenerate the course based on user feedback
+    return run_qa_agent(course_draft)
+
 def regenerate_with_feedback(
     material_paths: List[str],
     syllabus_text: str,
@@ -95,24 +142,26 @@ def regenerate_with_feedback(
 ) -> str:
     context = retrieve_relevant_context(syllabus_text)
     methodology = load_methodology()
-
-    # Add feedback to the prompt so the AI knows what to change
     prompt = f"""
-You are a course designer AI assistant.
+{methodology.strip()}
 
-Below is the course creation methodology:
-{methodology}
+---
 
-Context retrieved from the teaching materials:
-{context}
+**Course Name**: {course_name.strip()}
 
-Original course content generated earlier:
-{original_output}
+**Relevant Extracted Teaching Content**:
+{context.strip()}
 
-User feedback on what they want changed:
-{feedback}
+**Previously Generated Output**:
+{original_output.strip()}
 
-Please regenerate the course content based on the same methodology and context, while incorporating the user's feedback.
+**User Feedback for Regeneration**:
+{feedback.strip()}
+
+---
+
+Please regenerate the course content strictly based on the methodology and the extracted context above, while incorporating the user's feedback. Avoid using external facts or assumptions.
 """
     llm = ChatOpenAI(openai_api_key=API_KEY, model="gpt-4-1106-preview")
-    return llm.predict(prompt)
+    regenerated_draft = llm.predict(prompt)
+    return run_qa_agent(regenerated_draft)

@@ -1,10 +1,12 @@
 streamlit
 pdfplumber
 chromadb
-langchain
 langchain-community
-langchain-openai
 openai
 tiktoken
 numpy
 python-dotenv
+langchain
+langchain-core
+langgraph
+langchain-openai
