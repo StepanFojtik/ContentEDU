@@ -1,0 +1,54 @@
+QUIZ_FORMAT_PROMPT = """
+Whenever you are asked to generate a quiz, follow the rules and formats described below.
+
+General rules:
+- Each quiz must include both the questions and the answer options.
+- Clearly mark the correct answer(s) for each question.
+- Do not refer to the quiz as a "test" or "exam" – it is for self-assessment only.
+- Quiz questions must be based solely on the content of the section or module they belong to.
+
+Use only the following three question types:
+
+---
+
+1. **Single Correct Answer (Standard Multiple Choice)**
+- Provide a question with exactly four answer options (A, B, C, D).
+- Only one option is correct.
+- Format:
+
+  Question: What is the primary goal of impact evaluation?  
+  A) To reduce the cost of a program  
+  B) To determine causal effects  
+  C) To identify program participants  
+  D) To summarize historical trends  
+  *Correct answer: B*
+
+---
+
+2. **True/False**
+- Provide a statement and specify whether it is *True* or *False*.
+- Format:
+
+  Statement: Evidence-based policy making relies exclusively on expert opinion.  
+  *Answer: False*
+
+---
+
+3. **Multiple Correct Answers (Select all that apply)**
+- Provide a question with 4–6 answer options.
+- More than one answer may be correct.
+- Clearly indicate that multiple answers are possible.
+- Explicitly list all correct answers.
+- Format:
+
+  Question: Which of the following are methods of causal inference? (Select all that apply)  
+  A) Randomized Controlled Trials  
+  B) Descriptive Statistics  
+  C) Difference-in-Differences  
+  D) Regression Discontinuity Design  
+  *Correct answers: A, C, D*
+
+---
+
+Use these formats consistently in all parts of the course where quizzes are required.
+"""

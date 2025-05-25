@@ -12,20 +12,18 @@ from dotenv import load_dotenv
 from langgraph.graph import MessagesState
 from langchain_core.tools import tool
 from langchain_core.messages import HumanMessage
-from langchain_openai.chat_models import ChatOpenAI
-from langgraph.graph import StateGraph, END, START
+from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import ToolNode
 
-
-# Load environment variables -> our OPENAI_API_KEY
+# Load environment variables
 load_dotenv()
 
 # === Settings ===
-API_KEY = os.getenv("OPENAI_API_KEY")  # our OpenAI key
-VECTOR_DB_PATH = "vectorstore"         # folder to save the vector database
-CHUNK_SIZE = 1000                      # how many characters in one chunk
-CHUNK_OVERLAP = 100                    # how much text overlaps between chunks
+API_KEY = os.getenv("OPENAI_API_KEY")
+VECTOR_DB_PATH = "vectorstore"
+CHUNK_SIZE = 1000
+CHUNK_OVERLAP = 100
 
 # 1. Read and extract all text from a PDF file
 def extract_text_from_pdf(pdf_path: str) -> str:
@@ -37,13 +35,13 @@ def split_into_chunks(text: str) -> List[Document]:
     splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
     return splitter.create_documents([text])
 
-# 3. Create embeddings (vector representations) and save them to Chroma vector DB
+# 3. Create embeddings and store to Chroma
 def embed_and_store_chunks(docs: List[Document]):
     embeddings = OpenAIEmbeddings(openai_api_key=API_KEY)
     vectorstore = Chroma.from_documents(docs, embeddings, persist_directory=VECTOR_DB_PATH)
     vectorstore.persist()
 
-# 4. Search the vector DB using the syllabus to find the most relevant parts
+# 4. Search vector DB using syllabus
 def retrieve_relevant_context(syllabus_text: str, k: int = 5) -> str:
     embeddings = OpenAIEmbeddings(openai_api_key=API_KEY)
     vectorstore = Chroma(persist_directory=VECTOR_DB_PATH, embedding_function=embeddings)
@@ -51,12 +49,12 @@ def retrieve_relevant_context(syllabus_text: str, k: int = 5) -> str:
     docs = retriever.get_relevant_documents(syllabus_text)
     return "\n".join([doc.page_content for doc in docs])
 
-# 5. Load the course methodology file (how we want to structure the course)
+# 5. Load course methodology
 def load_methodology(path: str = "course_methodics.txt") -> str:
     with open(path, "r", encoding="utf-8") as file:
         return file.read()
 
-# 6. Build a prompt to send to the AI model (LLM)
+# 6. Build final prompt
 def generate_prompt(context: str, methodology: str, course_name: str) -> str:
     template = """
 {methodology}
@@ -79,15 +77,13 @@ Please generate a complete, structured Moodle course based strictly on the metho
         course_name=course_name.strip()
     )
 
-
-# 7. Send the final prompt to the AI model and get the course content
+# 7. Generate course content
 def get_course_content(final_prompt: str) -> str:
     llm = ChatOpenAI(openai_api_key=API_KEY, model="gpt-4-1106-preview")
     chain = LLMChain(llm=llm, prompt=PromptTemplate.from_template("{input}"))
     return chain.run({"input": final_prompt})
 
-
-#8. tools and agent 
+# 8. Quality review tool
 @tool
 def check_course_quality(course_draft: str) -> str:
     """Reviews the course draft for structure, coherence, and Moodle compliance."""
@@ -95,6 +91,7 @@ def check_course_quality(course_draft: str) -> str:
         HumanMessage(content=f"Please review the following course draft for structure, coherence, and Moodle compliance:\n\n{course_draft}")
     ])
     return response.content
+
 
 def call_model(state: MessagesState):
     model = ChatOpenAI(model="gpt-4", temperature=0).bind_tools([check_course_quality])
@@ -119,18 +116,15 @@ def run_qa_agent(course_draft: str) -> str:
     result = qa_app.invoke({"messages": [HumanMessage(content=course_draft)]})
     return result["messages"][-1].content
 
-# === Full Pipeline with QA Integration ===
-
+# === Pipeline ===
 def run_full_course_pipeline(material_paths: List[str], syllabus_text: str, course_name: str) -> str:
     full_text = "\n\n".join([extract_text_from_pdf(path) for path in material_paths])
     chunks = split_into_chunks(full_text)
     embed_and_store_chunks(chunks)
-
     context = retrieve_relevant_context(syllabus_text)
     methodology = load_methodology()
     prompt = generate_prompt(context, methodology, course_name)
     course_draft = get_course_content(prompt)
-
     return run_qa_agent(course_draft)
 
 def regenerate_with_feedback(

@@ -1,0 +1,34 @@
+ANNOUNCEMENTS_AND_INTRO_PROMPT = """
+You are tasked with generating the first two sections of a Moodle-based digital university course: **Announcements** and **Introduction**.
+
+---
+
+1. **Section – Announcements**  
+This section must always be present, but its content should remain empty. Insert only the following instructor note in italics:
+
+_(This section is intended for communication with students during the semester. We recommend posting organizational updates and important announcements here.)_
+
+---
+
+2. **Section – Introduction**  
+This section provides basic organizational and informational content about the course.
+
+Use the provided syllabus to include the following elements when available:
+- Course name and a brief welcome message
+- Names of instructors
+- Learning outcomes
+- Grading method
+- Link to the official syllabus
+- General rules and course structure
+- Optional: a short ungraded introductory quiz  
+  *(The quiz is for orientation only. Instructions for formatting quiz questions are provided in a separate prompt.)*
+
+Guidelines:
+- Use only the information found in the syllabus. If key information is missing, clearly note it (e.g., "The syllabus does not include details about the grading method.")
+- If no content is provided for a required item, insert the following placeholder message:  
+  _(This section is mandatory and should include course organization, instructors, learning outcomes, grading method, and a link to the syllabus.)_
+- Do not invent information or add motivational content.
+
+The output should include both sections, in the correct order, using Markdown formatting with clear section titles.
+"""
+
