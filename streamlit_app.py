@@ -1,8 +1,14 @@
 import streamlit as st
 import tempfile
-from course_pipeline import run_full_course_pipeline, regenerate_with_feedback
-from course_pipeline import extract_text_from_pdf, retrieve_relevant_context, get_course_content, load_methodology
 import os
+from course_pipeline import (
+    extract_text_from_pdf,
+    retrieve_relevant_context,
+    get_course_content,
+    load_methodology,
+    split_into_chunks,
+    embed_and_store_chunks
+)
 
 st.set_page_config(page_title="AI Moodle Course Generator", layout="wide")
 st.title("📘 Moodle Course Generator with Feedback Loop")
@@ -14,8 +20,6 @@ if "structure_output" not in st.session_state:
     st.session_state.structure_output = ""
 if "modules_output" not in st.session_state:
     st.session_state.modules_output = ""
-if "quiz_output" not in st.session_state:
-    st.session_state.quiz_output = ""
 if "conclusion_output" not in st.session_state:
     st.session_state.conclusion_output = ""
 if "intro_output" not in st.session_state:
@@ -33,16 +37,23 @@ with st.form("course_input_form"):
 if submitted and uploaded_materials and syllabus_file and course_name:
     with tempfile.TemporaryDirectory() as tmpdir:
         material_paths = []
+        full_text = ""
+
         for file in uploaded_materials:
             path = os.path.join(tmpdir, file.name)
             with open(path, "wb") as f:
                 f.write(file.read())
             material_paths.append(path)
+            full_text += extract_text_from_pdf(path) + "\n\n"
 
         syllabus_path = os.path.join(tmpdir, syllabus_file.name)
         with open(syllabus_path, "wb") as f:
             f.write(syllabus_file.read())
         syllabus_text = extract_text_from_pdf(syllabus_path)
+
+        # 🔥 Vložíme embeddingy do ChromaDB
+        chunks = split_into_chunks(full_text)
+        embed_and_store_chunks(chunks)
 
         context = retrieve_relevant_context(syllabus_text)
         methodology = load_methodology("methodology-structure.txt")
@@ -102,38 +113,9 @@ if st.session_state.step == 4:
     if st.button("Accept Modules"):
         st.session_state.step = 5
 
-# === Step 5: Generate Quiz ===
+# === Step 5: Conclusion ===
 if st.session_state.step == 5:
-    st.header("Step 5: Generate Quiz")
-    quiz_methodology = load_methodology("methodology-quiz.txt")
-    system_prompt = load_methodology("system_prompt.txt")
-    context = retrieve_relevant_context(st.session_state.syllabus_text)
-
-    quiz_prompt = f"{system_prompt}\n\n{quiz_methodology}\n\nCourse Name: {st.session_state.course_name}\n\nRelevant Context:\n{context}\n\nCourse Structure:\n{st.session_state.structure_output}\n\nModules:\n{st.session_state.modules_output}"
-
-    st.session_state.quiz_output = get_course_content(quiz_prompt)
-    st.session_state.step = 6
-    st.rerun()
-
-# === Step 6: Review Quiz ===
-if st.session_state.step == 6:
-    st.header("Step 6: Review Quiz")
-    st.text_area("Generated Quiz", st.session_state.quiz_output, height=300)
-    feedback = st.text_area("Suggest changes to quiz")
-    if st.button("Regenerate Quiz") and feedback:
-        quiz_methodology = load_methodology("methodology-quiz.txt")
-        system_prompt = load_methodology("system_prompt.txt")
-        context = retrieve_relevant_context(st.session_state.syllabus_text)
-
-        quiz_prompt = f"{system_prompt}\n\n{quiz_methodology}\n\nCourse Name: {st.session_state.course_name}\n\nRelevant Context:\n{context}\n\nModules:\n{st.session_state.modules_output}\n\nPrevious Quiz:\n{st.session_state.quiz_output}\n\nFeedback:\n{feedback}"
-
-        st.session_state.quiz_output = get_course_content(quiz_prompt)
-    if st.button("Accept Quiz"):
-        st.session_state.step = 7
-
-# === Step 7: Conclusion ===
-if st.session_state.step == 7:
-    st.header("Step 7: Generate Conclusion")
+    st.header("Step 5: Generate Conclusion")
     conc_methodology = load_methodology("methodology-conclusionAndFinQuiz.txt")
     system_prompt = load_methodology("system_prompt.txt")
     context = retrieve_relevant_context(st.session_state.syllabus_text)
@@ -141,12 +123,12 @@ if st.session_state.step == 7:
     prompt = f"{system_prompt}\n\n{conc_methodology}\n\nCourse Name: {st.session_state.course_name}\n\nRelevant Context:\n{context}\n\nModules:\n{st.session_state.modules_output}\n\nQuiz:\n{st.session_state.quiz_output}"
 
     st.session_state.conclusion_output = get_course_content(prompt)
-    st.session_state.step = 8
+    st.session_state.step = 6
     st.rerun()
 
-# === Step 8: Generate Introduction ===
-if st.session_state.step == 8:
-    st.header("Step 8: Generate Announcement & Introduction")
+# === Step 6: Generate Introduction ===
+if st.session_state.step == 6:
+    st.header("Step 6: Generate Announcement & Introduction")
     intro_methodology = load_methodology("methodology-AnnouncmentAndIntroduction.txt")
     system_prompt = load_methodology("system_prompt.txt")
     context = retrieve_relevant_context(st.session_state.syllabus_text)
@@ -154,13 +136,13 @@ if st.session_state.step == 8:
     prompt = f"{system_prompt}\n\n{intro_methodology}\n\nCourse Name: {st.session_state.course_name}\n\nRelevant Context:\n{context}\n\nModules:\n{st.session_state.modules_output}\n\nQuiz:\n{st.session_state.quiz_output}\n\nConclusion:\n{st.session_state.conclusion_output}"
 
     st.session_state.intro_output = get_course_content(prompt)
-    st.session_state.step = 9
+    st.session_state.step = 7
     st.rerun()
 
-# === Step 9: Final Output ===
-if st.session_state.step == 9:
+# === Step 7: Final Output ===
+if st.session_state.step == 7:
     st.header("✅ Final Moodle Course")
-    full_course = f"{st.session_state.intro_output}\n\n{st.session_state.modules_output}\n\n{st.session_state.quiz_output}\n\n{st.session_state.conclusion_output}"
+    full_course = f"{st.session_state.intro_output}\n\n{st.session_state.modules_output}\n\n{st.session_state.conclusion_output}"
     st.text_area("Full Course", full_course, height=600)
     st.download_button("Download as .txt", full_course, file_name="moodle_course.txt")
     st.success("Course generation complete.")

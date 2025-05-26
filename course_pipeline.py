@@ -50,7 +50,7 @@ def retrieve_relevant_context(syllabus_text: str, k: int = 5) -> str:
     return "\n".join([doc.page_content for doc in docs])
 
 # 5. Load course methodology
-def load_methodology(path: str = "course_methodics.txt") -> str:
+def load_methodology(path: str = "x.txt") -> str:
     with open(path, "r", encoding="utf-8") as file:
         return file.read()
 
