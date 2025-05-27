@@ -12,7 +12,7 @@ from course_pipeline import (
 )
 
 st.set_page_config(page_title="AI Moodle Course Generator", layout="wide")
-st.title("📘 Moodle Course Generator with Feedback Loop")
+st.title("📘 ContentEDU Course Generator")
 
 # === Session State Setup ===
 if "step" not in st.session_state:
@@ -167,8 +167,63 @@ if st.session_state.step == 5:
 
 # === Step 6: Final Output ===
 if st.session_state.step == 6:
-    st.subheader("✅ Final Moodle Course")
+    st.subheader("✅ Final Course")
     full_course = f"{st.session_state.intro_output}\n\n" + "\n\n".join(st.session_state.modules_output) + f"\n\n{st.session_state.conclusion_output}"
     st.text_area("Full Course", full_course, height=600)
     st.download_button("Download as .txt", full_course, file_name="moodle_course.txt")
     st.success("Course generation complete.")
+    # === HTML Export ===
+    from html import escape
+
+    def markdown_to_html(md_text):
+        html = md_text
+        # Nadpisy
+        html = re.sub(r'^# (.*?)$', r'<h1>\1</h1>', html, flags=re.MULTILINE)
+        html = re.sub(r'^## (.*?)$', r'<h2>\1</h2>', html, flags=re.MULTILINE)
+        html = re.sub(r'^### (.*?)$', r'<h3>\1</h3>', html, flags=re.MULTILINE)
+        # Tučné a kurzíva
+        html = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', html)
+        html = re.sub(r'\*(.*?)\*', r'<em>\1</em>', html)
+        # Seznamy
+        html = re.sub(r'^- (.*?)$', r'<li>\1</li>', html, flags=re.MULTILINE)
+        html = re.sub(r'((<li>.*?</li>\s*)+)', r'<ul>\1</ul>', html, flags=re.DOTALL)
+        # Nové řádky
+        html = html.replace("\n", "<br>")
+        return html
+
+    # Spoj celý kurz
+    full_course = f"{st.session_state.intro_output}\n\n" + "\n\n".join(st.session_state.modules_output) + f"\n\n{st.session_state.conclusion_output}"
+
+    # HTML generování
+    html_course = f"""
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{escape(st.session_state.course_name)}</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; margin: 40px; }}
+            h1, h2, h3 {{ color: #003366; }}
+            ul {{ margin-left: 20px; }}
+            hr {{ margin: 30px 0; }}
+        </style>
+    </head>
+    <body>
+        <h1>{escape(st.session_state.course_name)}</h1>
+        {markdown_to_html(st.session_state.intro_output)}<hr>
+                {''.join(
+            f"<h2>{escape(header)}</h2>{markdown_to_html(mod)}<hr>"
+            for header, mod in zip(st.session_state.modules_headers, st.session_state.modules_output)
+        )}
+        <h2>Conclusion</h2>
+        {markdown_to_html(st.session_state.conclusion_output)}
+    </body>
+    </html>
+    """
+
+    # Tlačítko ke stažení HTML
+    st.download_button(
+        label="Download as HTML",
+        data=html_course,
+        file_name="moodle_course.html",
+        mime="text/html"
+    )
