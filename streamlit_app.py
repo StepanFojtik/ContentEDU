@@ -92,6 +92,21 @@ if st.session_state.step == 2:
         st.session_state.modules_headers = [f"Module {m[0]} – {m[1]}" for m in matches]
         st.session_state.modules_list = [f"{m[0]}. **Module {m[0]} – {m[1]}**\n- {m[2]}" for m in matches]
         st.session_state.step = 3
+# === Display Structure + Confirmed Modules (always from step 3+) ===
+if st.session_state.step >= 3 and st.session_state.step < 6:
+    st.subheader("📋 Approved Course Structure")
+    st.text(st.session_state.structure_output)
+
+    if st.session_state.modules_output:
+        st.subheader("📦 Confirmed Module Content")
+        for i in range(st.session_state.current_module_index):
+            header = (
+                st.session_state.modules_headers[i]
+                if i < len(st.session_state.modules_headers)
+                else f"Module {i+1}"
+            )
+            st.markdown(f"**{header}**")
+            st.text(st.session_state.modules_output[i])
 
 # === Step 3: Generate Modules One-by-One ===
 if st.session_state.step == 3:
@@ -108,7 +123,6 @@ if st.session_state.step == 3:
         prompt = f"{system_prompt}\n\n{quiz_context}\n\n{module_methodology}\n\nCourse Name: {st.session_state.course_name}\n\nRelevant Context:\n{context}\n\nModule Header:\n{headers[current_index]}"
 
         module_content = get_course_content(prompt)
-        st.session_state.modules_output.append(module_content)
 
         st.text_area(f"Generated content for {headers[current_index]}", module_content, height=300)
         feedback = st.text_area("Suggest changes to this module")
@@ -118,8 +132,10 @@ if st.session_state.step == 3:
             st.session_state.modules_output[-1] = updated
             st.rerun()
         if st.button("Accept Module"):
+            st.session_state.modules_output.append(module_content)
             st.session_state.current_module_index += 1
             st.rerun()
+
     else:
         st.session_state.step = 4
         st.rerun()
@@ -171,7 +187,6 @@ if st.session_state.step == 6:
     full_course = f"{st.session_state.intro_output}\n\n" + "\n\n".join(st.session_state.modules_output) + f"\n\n{st.session_state.conclusion_output}"
     st.text_area("Full Course", full_course, height=600)
     st.download_button("Download as .txt", full_course, file_name="moodle_course.txt")
-    st.success("Course generation complete.")
     # === HTML Export ===
     from html import escape
 
@@ -227,3 +242,4 @@ if st.session_state.step == 6:
         file_name="moodle_course.html",
         mime="text/html"
     )
+    st.success("Course generation complete.")
