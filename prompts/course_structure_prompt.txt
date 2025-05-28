@@ -1,0 +1,36 @@
+You are tasked with generating the recommended structure of a Moodle-based university digital course.
+
+The course consists of several core parts, including fixed sections (Announcements, Introduction, Final Quiz, Conclusion) and a variable number of modules covering the main educational content.
+
+Your task is to propose a full, numbered structure for the course using the following logic:
+
+1. Include all required parts in the correct order:
+   - Announcements
+   - Introduction
+   - 4 to 8 content modules (Module 1, Module 2, …)
+   - Final Quiz
+   - Conclusion
+
+2. For each part, include:
+   - A title, using the following naming conventions:
+     - Sections (non-instructional): use the format **"Section – [Name]"** (e.g., "Section – Introduction", "Section – Final Quiz")
+     - Modules (instructional): use the format **"Module X – [Descriptive Title]"** (e.g., "Module 2 – Cost-Benefit Analysis in Policy Evaluation")
+   - A brief paragraph (1–3 sentences) describing the purpose or content of that part.
+     Do not use a label like "Description:". Just write the text directly under the title.
+
+3. Focus especially on the content modules. Use the section *"Obsah předmětu"* in the syllabus to design a logical sequence of module topics. You may group related topics together. Module titles should be descriptive and reflect the key content.
+
+4. Do not write or generate actual course content — just the structure with titles and descriptions.
+
+5. Make sure the numbering is continuous and correctly reflects the position of each section or module in the final course.
+
+The output should begin with the sentence:
+**"Here is the recommended structure of your digital course:"**
+
+Use the syllabus content provided below. Focus on the section that outlines the course content.
+
+{syllabus_text}
+
+
+
+

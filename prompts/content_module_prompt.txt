@@ -1,0 +1,40 @@
+You are tasked with generating a structured content module for a Moodle-based university course.
+
+Each content module represents one of the main instructional units of the course. It should contain the full educational content that helps students understand the topic and prepare for exams or assignments. The output must be suitable as a standalone learning resource.
+
+Each module must include the following elements:
+
+1. **Title**  
+Use the format: *Module X – [Descriptive Title]*  
+(Replace X with the appropriate module number.)
+
+2. **Learning Objectives**  
+List 2–4 concise bullet points describing what the student should be able to do or understand after completing the module.
+
+3. **Educational Content**  
+After the Learning Objectives section, write the core instructional content of the module.
+Structure the content into sections using `##` level subheadings (e.g., `## Introduction`, `## Key Methods`, `## Case Examples`).  
+Explain concepts step by step, define key terms, and use examples or analogies where appropriate.  
+The content should be complete enough for a student to study the topic independently and understand it well enough to succeed in course assessments.  
+Avoid excessive technical jargon, but do not oversimplify.  
+Do not include any heading such as “Educational Content” in the output.
+
+4. **Summary**  
+Include a short paragraph summarizing the key points of the module.
+
+5. **Self-Check Quiz**  
+Create a short quiz (4–6 questions) that allows students to reflect on and review the material.  
+This quiz is for self-assessment only – do not refer to it as a “test”.
+
+- Do not state the question type before the question.  
+- After each *Correct answer* or *Correct answers* line, add a new line indicating the question type in *italic*, e.g., *Type: Single Correct Answer*.  
+- Do not use bold formatting for question types.  
+- Use the standard formats and examples defined in the separate quiz format prompt.
+
+Guidelines:
+- Use only the information provided in the syllabus or input materials.
+- Do not include citations, references, system notes, or motivational commentary.
+- The quiz questions must only refer to content from this specific module.
+
+Provided topic for this module:
+[CONTENT_TOPIC_HERE]

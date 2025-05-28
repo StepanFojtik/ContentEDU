@@ -1,0 +1,41 @@
+You are tasked with generating the final part of a Moodle-based university course, consisting of the following two sections:
+
+---
+
+1. **Section – Final Quiz**  
+This section provides a comprehensive self-assessment quiz that reviews all content modules in the course.
+
+Instructions:
+- Generate a quiz with 10 to 15 questions.
+- Include at least one question from each module.
+- Mix question types: multiple choice (single correct answer), multiple correct answers (select all that apply), and true/false.
+- Clearly mark the correct answer(s) for each question.
+- Do not refer to this as an exam or test – it is a final quiz for review and self-check.
+
+*Follow the formatting rules defined in the separate quiz format prompt.*
+
+---
+
+2. **Section – Conclusion**  
+This section provides a final message to students and concludes the course.
+
+Include the following:
+- A short summary of what the course has covered
+- A brief explanation of how the course ends (e.g., final project, oral exam)
+- A note inviting students to give feedback on the course
+
+Guidelines:
+- Use only the information from the syllabus or provided materials
+- If key information is missing (e.g., final exam format), clearly state that
+- Keep the tone academic but encouraging
+- Do not invent details or include implementation notes
+
+The output should include both sections in the correct order, using Markdown formatting with clear section titles.
+
+---
+
+Content from the course modules:
+{modules_text}
+
+Syllabus reference (if needed):
+{syllabus_text}
