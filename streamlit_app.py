@@ -73,7 +73,7 @@ if submitted and uploaded_materials and syllabus_file and course_name:
 # === Step 2: Review Structure ===
 if st.session_state.step == 2:
     st.subheader("Review Generated Structure")
-    st.text_area("Generated Structure", st.session_state.structure_output, height=300)
+    structure_text = st.text_area("Generated Structure", st.session_state.structure_output, height=300)
 
     feedback = st.text_area("Suggest changes to structure")
     if st.button("Regenerate Structure") and feedback:
@@ -85,6 +85,7 @@ if st.session_state.step == 2:
 
         st.session_state.structure_output = get_course_content(new_prompt)
     if st.button("Accept Structure"):
+        st.session_state.structure_output = structure_text
         # === Extract Module Sections ===
         module_pattern = r"(?<=\n)\d+\. \*\*Module (\d+) – (.*?)\*\*\n\s*- (.*?)\n"
         matches = re.findall(module_pattern, st.session_state.structure_output, re.DOTALL)
@@ -120,11 +121,31 @@ if st.session_state.step == 3:
         context = retrieve_relevant_context(st.session_state.syllabus_text)
         quiz_context = load_methodology("methodology-quiz.txt")
 
-        prompt = f"{system_prompt}\n\n{quiz_context}\n\n{module_methodology}\n\nCourse Name: {st.session_state.course_name}\n\nRelevant Context:\n{context}\n\nModule Header:\n{headers[current_index]}"
+        # Klíč pro modulový výstup v session_state
+        module_key = f"module_content_{current_index}"
 
-        module_content = get_course_content(prompt)
+        # Získání nebo vytvoření obsahu
+        if module_key not in st.session_state:
+            prompt = f"{system_prompt}\n\n{quiz_context}\n\n{module_methodology}\n\nCourse Name: {st.session_state.course_name}\n\nRelevant Context:\n{context}\n\nModule Header:\n{headers[current_index]}"
+            st.session_state[module_key] = get_course_content(prompt)
 
-        st.text_area(f"Generated content for {headers[current_index]}", module_content, height=300)
+        # Uživatel upravuje text
+        edited_module = st.text_area(f"Generated content for {headers[current_index]}", st.session_state[module_key], height=300)
+
+        # Možnost regenerace
+        feedback = st.text_area("Suggest changes to this module")
+        if st.button("Regenerate Module") and feedback:
+            prompt = f"{system_prompt}\n\n{quiz_context}\n\n{module_methodology}\n\nCourse Name: {st.session_state.course_name}\n\nRelevant Context:\n{context}\n\nModule Header:\n{headers[current_index]}\n\nUser Feedback:\n{feedback}"
+            updated = get_course_content(prompt)
+            st.session_state[module_key] = updated
+            st.rerun()
+
+        # Potvrzení modulu
+        if st.button("Accept Module"):
+            st.session_state.modules_output.append(edited_module)
+            st.session_state.current_module_index += 1
+            st.rerun()
+
         feedback = st.text_area("Suggest changes to this module")
         if st.button("Regenerate Module") and feedback:
             prompt += f"\n\nUser Feedback:\n{feedback}"
@@ -132,7 +153,7 @@ if st.session_state.step == 3:
             st.session_state.modules_output[-1] = updated
             st.rerun()
         if st.button("Accept Module"):
-            st.session_state.modules_output.append(module_content)
+            st.session_state.modules_output.append(edited_module)  # <<< použít uživatelský text
             st.session_state.current_module_index += 1
             st.rerun()
 
@@ -151,15 +172,17 @@ if st.session_state.step == 4:
     prompt = f"{system_prompt}\n\n{quiz_context}\n\n{conc_methodology}\n\nCourse Name: {st.session_state.course_name}\n\nRelevant Context:\n{context}\n\nModules:\n{chr(10).join(st.session_state.modules_output)}"
 
     st.session_state.conclusion_output = get_course_content(prompt)
-    st.text_area("Generated Conclusion", st.session_state.conclusion_output, height=300)
+    edited_conclusion = st.text_area("Generated Conclusion", st.session_state.conclusion_output, height=300)
     feedback = st.text_area("Suggest changes to conclusion")
     if st.button("Regenerate Conclusion") and feedback:
         prompt += f"\n\nUser Feedback:\n{feedback}"
         st.session_state.conclusion_output = get_course_content(prompt)
         st.rerun()
     if st.button("Accept Conclusion"):
+        st.session_state.conclusion_output = edited_conclusion
         st.session_state.step = 5
         st.rerun()
+
 
 # === Step 5: Generate Introduction ===
 if st.session_state.step == 5:
@@ -171,15 +194,17 @@ if st.session_state.step == 5:
     prompt = f"{system_prompt}\n\n{intro_methodology}\n\nCourse Name: {st.session_state.course_name}\n\nRelevant Context:\n{context}\n\nModules:\n{chr(10).join(st.session_state.modules_output)}\n\nConclusion:\n{st.session_state.conclusion_output}"
 
     st.session_state.intro_output = get_course_content(prompt)
-    st.text_area("Generated Announcement & Introduction", st.session_state.intro_output, height=300)
+    edited_intro = st.text_area("Generated Announcement & Introduction", st.session_state.intro_output, height=300)
     feedback = st.text_area("Suggest changes to intro")
     if st.button("Regenerate Intro") and feedback:
         prompt += f"\n\nUser Feedback:\n{feedback}"
         st.session_state.intro_output = get_course_content(prompt)
         st.rerun()
-    if st.button("Accept Intro"):
+    if st.button("Accept Announcment & Intro"):
+        st.session_state.intro_output = edited_intro  # <<< použít editovaný
         st.session_state.step = 6
         st.rerun()
+
 
 # === Step 6: Final Output ===
 if st.session_state.step == 6:
