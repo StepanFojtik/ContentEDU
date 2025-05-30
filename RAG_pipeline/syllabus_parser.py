@@ -3,7 +3,7 @@ import re
 from typing import Dict
 
 def parse_syllabus(pdf_path: str) -> Dict[str, str]:
-    # Open the PDF and extract all text from its pages
+    # Open the syllabus PDF and extract full text
     with pdfplumber.open(pdf_path) as pdf:
         text = "\n".join([page.extract_text() or "" for page in pdf.pages])
 
@@ -11,7 +11,7 @@ def parse_syllabus(pdf_path: str) -> Dict[str, str]:
     course_name_match = re.search(r"Název (?:česky|v jazyce výuky):\s*(.+)", text)
     course_name = course_name_match.group(1).strip() if course_name_match else ""
 
-    # Extract instructor(s) — supports multiple lines and stops at the next section
+    # Extract instructor(s) – includes multiline values until another section starts
     instructor_match = re.findall(r"Vyučující:\s*((?:.+\n?)+?)(?:Omezení pro zápis|Doporučené doplňky kurzu|$)", text)
     instructor = instructor_match[0].strip() if instructor_match else ""
 

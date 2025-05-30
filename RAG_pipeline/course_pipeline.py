@@ -1,6 +1,10 @@
-# LangGraph pipeline: ContentEDU Generator
+# ContentEDU – LangGraph pipeline for course generation
+# This script defines the backend logic for generating structured digital courses
+# from teaching materials and syllabi using LLMs and LangGraph
 import os
 from typing import List
+import re
+
 import pdfplumber
 from dotenv import load_dotenv
 
@@ -16,12 +20,11 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain_community.chat_models import ChatOpenAI
-import re
 
-# Load environment variables -> our OPENAI_API_KEY
+# Load environment variables from .env file (e.g., API keys)
 load_dotenv()
 
-# === Settings ===
+# === Global configuration settings ===
 API_KEY = os.getenv("OPENAI_API_KEY")            # OpenAI key
 VECTOR_DB_PATH = "vectorstore"                   # Directory for vector DB
 CHUNK_SIZE = 1000                                 # Character length per chunk
@@ -53,17 +56,16 @@ def retrieve_relevant_context(syllabus_text: str, k: int = 5) -> str:
     docs = retriever.get_relevant_documents(syllabus_text)
     return "\n".join([doc.page_content for doc in docs])
 
-# === LangGraph Nodes ===
-# These nodes define the flow of course content generation
+# === Prompt-based generation functions ===
+# These functions use prompt templates and LLMs to generate different parts of the course
 
-# === Prompt implementation for course structure ===
-# Loads a text prompt file from the prompts directory
+# Load a text prompt from the prompts directory
 def load_prompt(filename: str) -> str:
     path = os.path.join("prompts", filename)
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
     
-# Generates course structure using external prompt file
+# Generate the course structure based on the syllabus
 def generate_structure(syllabus_text: str) -> dict:
     prompt_template = load_prompt("course_structure_prompt.txt")
     system_prompt = load_prompt("system_prompt.txt")
@@ -73,10 +75,9 @@ def generate_structure(syllabus_text: str) -> dict:
     chain = LLMChain(llm=llm, prompt=prompt)
 
     output = chain.run({"syllabus_text": syllabus_text})
-    return {"text": output}  # You can parse this to structured format if needed
+    return {"text": output} 
 
-# === Prompt implementation for announcements and introduction ===
-#Generates the Announcements and Introduction sections from a syllabus, including quiz formatting instructions
+# Generate the Announcements and Introduction sections based on the syllabus and context
 def generate_announcements_and_intro(syllabus_text: str, context: str, structure_text: str = "") -> str:
     intro_prompt = load_prompt("announcements_and_intro_prompt.txt")
     quiz_format = load_prompt("quiz_format_prompt.txt")
@@ -89,8 +90,7 @@ def generate_announcements_and_intro(syllabus_text: str, context: str, structure
     
     return chain.run({"syllabus_text": syllabus_text, "context": context, "structure_text": structure_text})
 
-# === Prompt implementation for content modules ===
-# Generates a content module for the course with embedded quiz formatting rules.
+# Generate one content module including learning content and a self-check quiz
 def generate_module(idx: int, topic: str, context: str) -> str:
     module_template = load_prompt("content_module_prompt.txt")
     quiz_format = load_prompt("quiz_format_prompt.txt")
@@ -103,8 +103,7 @@ def generate_module(idx: int, topic: str, context: str) -> str:
     chain = LLMChain(llm=llm, prompt=prompt)
     return chain.run({"context": context})
 
-# === Prompt implementation for final quiz and conclusion ===
-# Generates the Final Quiz and Conclusion sections using the syllabus and course modules, including quiz formatting instructions
+# Generate the Final Quiz and Conclusion sections using previous modules and syllabus
 def generate_final_parts(syllabus_text: str, structure: dict, modules: list, context: str) -> str:
     prompt_template = load_prompt("conclusion_and_final_quiz_prompt.txt")
     quiz_format = load_prompt("quiz_format_prompt.txt")
@@ -121,44 +120,43 @@ def generate_final_parts(syllabus_text: str, structure: dict, modules: list, con
         "context": context
     })
 
+# === LangGraph state ===
+# Shared data structure passed between graph steps during course generation
 
-# === 1. State ===
-# The state dictionary that carries data between graph steps
 class CourseState(dict):
-    course_name: str                  # Name of the course
-    syllabus_text: str                # Full syllabus text
-    structure: dict                    # Structured outline of the course (JSON or text)
+    course_name: str                  
+    syllabus_text: str                
+    structure: dict                   
     context: str
-    modules: list                     # List of module contents
-    announcements_intro: str          # Combined content of Announcements and Introduction
-    final_parts: str                  # Combined content of Final Quiz and Conclusion
-    full_draft: str                   # Assembled full draft of the course
-    qa_result: str                    # Output of the QA agent
+    modules: list                     
+    announcements_intro: str         
+    final_parts: str                  
+    full_draft: str                   
+    qa_result: str                    
 
-# === 2. Nodes ===
+# === LangGraph nodes ===
+# These functions represent individual steps in the LangGraph pipeline.
+# Each node takes the current state, performs a task, and returns an updated state.
 
+# Retrieve relevant content from uploaded materials using vector search
 def node_retrieve_context(state):
     context = retrieve_relevant_context(state["syllabus_text"])
     return {**state, "context": context}
-# Each node is a step in the course generation pipeline
 
+# Generate the overall structure of the course from the syllabus
 def node_generate_structure(state):
-    # Generates the structure of the course based on syllabus
     structure = generate_structure(state["syllabus_text"])
     return {**state, "structure": structure}
 
+# Generate Announcements and Introduction sections
 def node_announcements_intro(state):
-    # Generates Announcements and Introduction sections
     content = generate_announcements_and_intro(state["syllabus_text"], state["context"])
     return {**state, "announcements_intro": content}
 
+# Generate all content modules based on the structure and context
 def node_generate_modules(state):
     structure_text = state["structure"]["text"]
-
-    # Najde řádky jako: Module 1 – Název modulu
     topics = re.findall(r"Module \d+\s*[-–]\s*(.+)", structure_text)
-
-
 
     modules = []
     for idx, topic in enumerate(topics, 1):
@@ -167,8 +165,8 @@ def node_generate_modules(state):
 
     return {**state, "modules": modules}
 
+ # Generate the Final Quiz and Conclusion sections
 def node_final_parts(state):
-    # Generates Final Quiz and Conclusion sections
     content = generate_final_parts(
         syllabus_text=state["syllabus_text"],
         structure=state["structure"],
@@ -177,29 +175,30 @@ def node_final_parts(state):
     )
     return {**state, "final_parts": content}
 
+# Assemble all parts into a final draft (QA agent is currently disabled)
 def node_qa_check(state):
-    # QA check is currently disabled
     full_draft = "\n\n".join([
         state["announcements_intro"],
         *state["modules"],
         state["final_parts"]
     ])
-    # qa_result = run_qa_agent(full_draft)
     qa_result = "(QA agent is currently disabled)"
     return {**state, "full_draft": full_draft, "qa_result": qa_result}
 
-# === 3. LangGraph Definition ===
-# Builds the graph structure and defines transitions between nodes
+# === LangGraph definition ===
+# Defines the full pipeline structure and transitions between steps
 
 graph = StateGraph(CourseState)
-graph.add_node("retrieve_context", node_retrieve_context)
-graph.add_node("generate_structure", node_generate_structure)          # First: structure
-graph.add_node("gen_announcements_intro", node_announcements_intro)      # Then: intro sections
-graph.add_node("generate_modules", node_generate_modules)            # Then: main modules
-graph.add_node("gen_final_parts", node_final_parts)                      # Then: quiz + conclusion
-graph.add_node("qa_check", node_qa_check)                            # Final: QA check
 
-# Define the graph flow
+# Register individual nodes (functions) that make up the pipeline
+graph.add_node("retrieve_context", node_retrieve_context)
+graph.add_node("generate_structure", node_generate_structure)          
+graph.add_node("gen_announcements_intro", node_announcements_intro)      
+graph.add_node("generate_modules", node_generate_modules)           
+graph.add_node("gen_final_parts", node_final_parts)                     
+graph.add_node("qa_check", node_qa_check)                           
+
+# Define execution flow from entry to final node
 graph.set_entry_point("retrieve_context")
 graph.add_edge("retrieve_context", "generate_structure")
 graph.add_edge("generate_structure", "gen_announcements_intro")
@@ -208,15 +207,7 @@ graph.add_edge("generate_modules", "gen_final_parts")
 graph.add_edge("gen_final_parts", "qa_check")
 graph.set_finish_point("qa_check")
 
-# Compile the graph with in-memory state tracking
+# Compile the graph with in-memory checkpointing
 course_graph = graph.compile(checkpointer=MemorySaver())
 
-# === 4. Execution Example ===
-# This is how you'd invoke the graph with sample input
-# example_state = {
-#     "course_name": "Intro to AI",
-#     "syllabus_text": syllabus_extracted_text
-# }
-# result = course_graph.invoke(example_state)
-# print(result["qa_result"])
 
