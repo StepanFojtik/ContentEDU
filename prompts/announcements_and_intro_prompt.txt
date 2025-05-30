@@ -1,38 +1,50 @@
-You are tasked with generating the first two sections of a Moodle-based digital university course: **Announcements** and **Introduction**.
+You are tasked with generating the first two sections of a Moodle-based digital university course: Announcements and Introduction.
+
+Below is the official course syllabus in Czech. Use it as the only source of truth. Do not invent any content. If an item is not present, write: "Information not found in syllabus."
 
 ---
+SYLLABUS:
+{syllabus_text}
+---
 
-1. **Section – Announcements**  
-This section must always be present, but its content should remain empty. Insert only the following instructor note as plain paragraph text (not italicized or Markdown):
+1. Section – Announcements  
+Always include this section first. Its content must remain empty except for the following instructor note (write it as plain paragraph text, not italicized or Markdown):
 
 (This section is intended for communication with students during the semester. We recommend posting organizational updates and important announcements here.)
 
----
+2. Section – Introduction  
+Use the provided syllabus to extract and present the following items.
 
-2. **Section – Introduction**  
-This section provides basic organizational and informational content about the course.
+For each item:
+- If the information is found in the syllabus, present it.
+- If not found, write: Information not found in syllabus.
 
-Use the provided syllabus to extract the following items:
+Items to extract:
+- Course name – from “Název předmětu”
+- Instructor(s) – extract *all* names from “Vyučující” section. If multiple are listed, include them all.
+- Learning outcomes – from “Výsledky učení” or similar section
+- Grading method – from “Způsoby a kritéria hodnocení”
+- Syllabus link – always use the placeholder (insert syllabus link here)
+- Course structure – summarize from the AI-generated structure or “Obsah předmětu”
 
-- **Course name** – taken directly from the syllabus
-- **Instructor(s)** – use the “Vyučující” field from the syllabus
-- **Learning outcomes** – take from the “Výsledky učení” section
-- **Grading method** – use content from “Způsoby a kritéria hodnocení”
-- **Syllabus link** – insert a placeholder like `(insert syllabus link here)`
-- **Course structure** – summarize from either the AI-generated structure or the “Obsah předmětu” section in the syllabus
+Use the following Markdown format:
 
-Each item should be presented with a clear heading using `##` (e.g., `## Learning Outcomes`) followed by the actual content in paragraph or bullet form. Do not use placeholder text if the information is found in the syllabus.
+# Section – Introduction
 
----
+## Course Name  
+[actual content or: Information not found in syllabus.]
 
-3. **Introductory Quiz**  
-Include a short ungraded quiz for orientation. The quiz should contain 5 simple knowledge-check questions – one based on each main topic/module from the course.
+## Instructor(s)  
+[actual content or: Information not found in syllabus.]
 
-Use only the module titles and the course content to generate these questions. The quiz should mix question types (single answer, true/false, multiple correct), and follow formatting rules from the quiz format prompt.
+## Learning Outcomes  
+[actual content or: Information not found in syllabus.]
 
----
+## Grading Method  
+[actual content or: Information not found in syllabus.]
 
-Formatting notes:
-- Do not use italic text or placeholder markers.
-- Do not include system messages or comments in the output.
-- Use Markdown structure with `# Section – Introduction`, `##`, etc.
+## Syllabus Link  
+(insert syllabus link here)
+
+## Course Structure  
+[actual content or: Information not found in syllabus.]

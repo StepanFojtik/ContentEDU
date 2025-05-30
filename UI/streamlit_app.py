@@ -8,6 +8,7 @@ import re
 # === Přidání cesty k RAG_pipeline ===
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "RAG_pipeline")))
 
+from syllabus_parser import parse_syllabus
 from course_pipeline import (
     extract_text_from_pdf,
     embed_and_store_chunks,
@@ -70,7 +71,28 @@ if st.session_state.current_step == 1:
                 f.write(uploaded_syllabus.getbuffer())
 
             # Extract syllabus text
-            syllabus_text = extract_text_from_pdf(syllabus_path)
+            syllabus_info = parse_syllabus(syllabus_path)
+            syllabus_text = "\n".join([
+    "# Section – Introduction",
+    "",
+    "## Course Name",
+    syllabus_info['course_name'],
+    "",
+    "## Instructor(s)",
+    syllabus_info['instructor'],
+    "",
+    "## Learning Outcomes",
+    syllabus_info['learning_outcomes'],
+    "",
+    "## Grading Method",
+    syllabus_info['grading_method'],
+    "",
+    "## Course Content",
+    syllabus_info['subject_content'],
+    "",
+    "## Syllabus Link",
+    "(insert syllabus link here)"
+])
 
             # Embed and store materials
             for path in material_paths:
