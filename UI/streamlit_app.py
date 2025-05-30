@@ -307,8 +307,7 @@ elif st.session_state.current_step == 7:
             st.rerun()
 
 # === Step 8: Review final part and export course ===
-# Displays the final quiz and conclusion. User can approve it, upload the full course to Moodle,
-# or export it as a standalone HTML file.
+# Displays the final quiz and conclusion. User can approve it or export it as a downloadable HTML file
 
 elif st.session_state.current_step == 8:
     st.header("🏁 Step 8: Review Final Part")
@@ -317,7 +316,7 @@ elif st.session_state.current_step == 8:
         # Display the generated final part
         st.markdown(st.session_state.final_parts)
 
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
 
         with col1:
             # Final confirmation (no action, just visual feedback)
@@ -325,19 +324,6 @@ elif st.session_state.current_step == 8:
                 st.success("🎉 Course generation complete!")
 
         with col2:
-            # Upload entire course to Moodle LMS via API
-            if st.button("🚀 Upload to Moodle", key="step8_upload"):
-                from upload_to_moodle_api import upload_to_moodle
-                with st.spinner("Uploading course to Moodle..."):
-                    result = upload_to_moodle(
-                        course_name=st.session_state.course_name,
-                        modules=st.session_state.modules,
-                        intro=st.session_state.announcements_intro,
-                        final_parts=st.session_state.final_parts
-                    )
-                    st.success(f"✅ Course successfully uploaded to Moodle! Course ID: {result['id']}")
-
-        with col3:
             # Export the full course as a downloadable HTML file
             if st.button("⬇️ Export to HTML", key="step8_export"):
                 html_content = "<html><head><meta charset='UTF-8'><title>Course Export</title></head><body>"
