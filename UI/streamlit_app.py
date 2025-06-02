@@ -6,6 +6,7 @@ import re
 
 # Add the RAG_pipeline folder to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "RAG_pipeline")))
+#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Import backend functions and parsers
 from syllabus_parser import parse_syllabus
@@ -17,7 +18,8 @@ from course_pipeline import (
     generate_announcements_and_intro,
     retrieve_relevant_context,
     generate_final_parts,
-    generate_module
+    generate_module,
+    format_course_structure_for_prompt
 )
 
 # === UI title ===
@@ -82,11 +84,15 @@ if st.session_state.current_step == 1:
 
             # Parse and reformat syllabus into Markdown-like structure
             syllabus_info = parse_syllabus(syllabus_path)
+            #pro debugging pak smayat
+            st.write("DEBUG – Parsed syllabus info:")
+            st.write(syllabus_info)
+
             syllabus_text = "\n".join([
                 "# Section – Introduction",
                 "",
                 "## Course Name",
-                syllabus_info['course_name'],
+                course_name,
                 "",
                 "## Instructor(s)",
                 syllabus_info['instructor'],
@@ -192,9 +198,11 @@ elif st.session_state.current_step == 4:
         with st.spinner("Generating..."):
             # Generate the first two sections of the course using prompt + context
             intro = generate_announcements_and_intro(
+                course_name=st.session_state.course_name,
                 syllabus_text=st.session_state.syllabus_text,
-                context=st.session_state.context
-            )
+                context=st.session_state.context,
+                structure_text=format_course_structure_for_prompt(st.session_state.structure["text"])
+)
 
             # Save result and move to next step
             st.session_state.announcements_intro = intro

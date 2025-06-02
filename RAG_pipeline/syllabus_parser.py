@@ -7,36 +7,41 @@ def parse_syllabus(pdf_path: str) -> Dict[str, str]:
     with pdfplumber.open(pdf_path) as pdf:
         text = "\n".join([page.extract_text() or "" for page in pdf.pages])
 
-    # Extract course name from the syllabus
-    course_name_match = re.search(r"Název (?:česky|v jazyce výuky):\s*(.+)", text)
-    course_name = course_name_match.group(1).strip() if course_name_match else ""
+    # Extract instructor(s)
+    instructor_match = re.search(r"Name of lecturer\(s\):\s*(.+?)(?=\n\S|$)", text, re.DOTALL)
+    instructor = instructor_match.group(1).strip() if instructor_match else ""
 
-    # Extract instructor(s) – includes multiline values until another section starts
-    instructor_match = re.findall(r"Vyučující:\s*((?:.+\n?)+?)(?:Omezení pro zápis|Doporučené doplňky kurzu|$)", text)
-    instructor = instructor_match[0].strip() if instructor_match else ""
-
-    # Extract learning outcomes (bullet-point style under a specific section)
-    learning_outcomes_match = re.search(r"Po úspěšném absolvování.*?\n((?:- .+\n)+)", text)
+    # Extract learning outcomes (whole block until next section)
+    learning_outcomes_match = re.search(
+        r"Learning outcomes and competences:\s*((?:[\s\S]*?))(?=Assessment methods and criteria:|Recommended reading:|\n\S)",
+    text
+    )
     if learning_outcomes_match:
-        lines = learning_outcomes_match.group(1).strip().splitlines()
-        learning_outcomes = "\n".join(lines)
+        learning_outcomes = learning_outcomes_match.group(1).strip()
     else:
         learning_outcomes = ""
 
-    # Extract grading method section 
+
+    # Extract grading method / assessment methods
     grading_match = re.search(
-        r"Způsoby a kritéria hodnocení:.*?(Vypracování.*?Celkem\s+100\s*%)",
+        r"Assessment methods and criteria:\s*(.+?)(?=Recommended reading:|\Z)", 
         text, re.DOTALL
     )
-    grading_method = grading_match.group(1).strip() if grading_match else ""
+    if grading_match:
+        raw = grading_match.group(1)
+        lines = [line.strip() for line in raw.strip().splitlines() if "%" in line]
+        grading_method = "\n".join(lines)
+    else:
+        grading_method = ""
 
-    # Extract subject content (between section headers)
-    subject_content_match = re.search(r"Obsah předmětu:(.*?)Způsob studia", text, re.DOTALL)
+
+    # Extract course contents (as fallback "structure proxy" if needed)
+    subject_content_match = re.search(
+        r"Course contents:\s*(.+?)(?=\n\S|$)", text, re.DOTALL
+    )
     subject_content = subject_content_match.group(1).strip() if subject_content_match else ""
 
-    # Return extracted fields as a dictionary
     return {
-        "course_name": course_name,
         "instructor": instructor,
         "learning_outcomes": learning_outcomes,
         "grading_method": grading_method,

@@ -1,10 +1,20 @@
 You are tasked with generating the first two sections of a Moodle-based digital university course: Announcements and Introduction.
 
-Below is the official course syllabus in Czech. Use it as the only source of truth. Do not invent any content. If an item is not present, write: "Information not found in syllabus."
+Use the provided inputs below. Do not invent any content. If a specific item is missing, write: "Information not found in syllabus."
+
+---
+COURSE TITLE:
+{course_name}
+---
 
 ---
 SYLLABUS:
 {syllabus_text}
+---
+
+---
+COURSE STRUCTURE:
+{structure_text}
 ---
 
 1. Section – Announcements  
@@ -13,26 +23,27 @@ Always include this section first. Its content must remain empty except for the 
 (This section is intended for communication with students during the semester. We recommend posting organizational updates and important announcements here.)
 
 2. Section – Introduction  
-Use the provided syllabus to extract and present the following items.
+This section introduces the course and helps students understand what to expect. Use the following input sources:
+- For the course name, use the name provided in the `COURSE TITLE` block.
+- For all other items, extract them from the `SYLLABUS` or the `COURSE STRUCTURE` block.
 
-For each item:
-- If the information is found in the syllabus, present it.
-- If not found, write: Information not found in syllabus.
+**Items to include:**
 
-Items to extract:
-- Course name – from “Název předmětu”
-- Instructor(s) – extract *all* names from “Vyučující” section. If multiple are listed, include them all.
-- Learning outcomes – from “Výsledky učení” or similar section
-- Grading method – from “Způsoby a kritéria hodnocení”
-- Syllabus link – always use the placeholder (insert syllabus link here)
-- Course structure – summarize from the AI-generated structure or “Obsah předmětu”
+- **Course Name** – from the COURSE TITLE section.
+- **Instructor(s)** – from the syllabus (“Name of lecturer(s)” or similar). List all instructors.
+- **Learning Outcomes** – from the section “Learning outcomes and competences” or similar.
+- **Grading Method** – from the section “Assessment methods and criteria” or similar.
+- **Syllabus Link** – always write: (insert syllabus link here)
+- **Course Structure** – list only the instructional modules from the COURSE STRUCTURE block. Exclude sections like "Announcements", "Introduction", "Final Quiz", or "Conclusion". Only include items titled "Module X – ...".
+
+Keep the Introduction concise and focused. Do not paste large sections of the syllabus verbatim. Summarize where appropriate.
 
 Use the following Markdown format:
 
 # Section – Introduction
 
 ## Course Name  
-[actual content or: Information not found in syllabus.]
+[course name provided by user]
 
 ## Instructor(s)  
 [actual content or: Information not found in syllabus.]
@@ -47,4 +58,4 @@ Use the following Markdown format:
 (insert syllabus link here)
 
 ## Course Structure  
-[actual content or: Information not found in syllabus.]
+[List the instructional modules here as bullet points. Only include items titled "Module X – ..."]

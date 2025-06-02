@@ -77,8 +77,8 @@ def generate_structure(syllabus_text: str) -> dict:
     output = chain.run({"syllabus_text": syllabus_text})
     return {"text": output} 
 
-# Generate the Announcements and Introduction sections based on the syllabus and context
-def generate_announcements_and_intro(syllabus_text: str, context: str, structure_text: str = "") -> str:
+# Generate the Announcements and Introduction sections based on the syllabus and context - upraveno
+def generate_announcements_and_intro(course_name: str, syllabus_text: str, context: str, structure_text: str = "") -> str:
     intro_prompt = load_prompt("announcements_and_intro_prompt.txt")
     quiz_format = load_prompt("quiz_format_prompt.txt")
 
@@ -88,7 +88,12 @@ def generate_announcements_and_intro(syllabus_text: str, context: str, structure
     llm = ChatOpenAI(openai_api_key=API_KEY, model="gpt-4-1106-preview")
     chain = LLMChain(llm=llm, prompt=prompt)
     
-    return chain.run({"syllabus_text": syllabus_text, "context": context, "structure_text": structure_text})
+    return chain.run({
+        "course_name": course_name,
+        "syllabus_text": syllabus_text,
+        "context": context,
+        "structure_text": structure_text
+    })
 
 # Generate one content module including learning content and a self-check quiz
 def generate_module(idx: int, topic: str, context: str) -> str:
@@ -120,6 +125,21 @@ def generate_final_parts(syllabus_text: str, structure: dict, modules: list, con
         "context": context
     })
 
+# === Utility functions === pridano
+
+def format_course_structure_for_prompt(structure: str) -> str:
+    """
+    Converts the course structure string into a bullet-point list of instructional modules only.
+    """
+    lines = structure.splitlines()
+    bullet_lines = []
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith("Module") and "–" in line:
+            bullet_lines.append(f"- {line}")
+    return "\n".join(bullet_lines)
+
 # === LangGraph state ===
 # Shared data structure passed between graph steps during course generation
 
@@ -148,9 +168,17 @@ def node_generate_structure(state):
     structure = generate_structure(state["syllabus_text"])
     return {**state, "structure": structure}
 
-# Generate Announcements and Introduction sections
+# Generate Announcements and Introduction sections - tohle ted upraveno
 def node_announcements_intro(state):
-    content = generate_announcements_and_intro(state["syllabus_text"], state["context"])
+    structure_text = state["structure"]["text"]
+    structure_for_prompt = format_course_structure_for_prompt(structure_text)
+
+    content = generate_announcements_and_intro(
+        course_name=state["course_name"],              # nově přidáno
+        syllabus_text=state["syllabus_text"],
+        context=state["context"],
+        structure_text=structure_for_prompt
+    )
     return {**state, "announcements_intro": content}
 
 # Generate all content modules based on the structure and context
