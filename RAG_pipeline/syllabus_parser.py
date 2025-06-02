@@ -3,42 +3,42 @@ import re
 from typing import Dict
 
 def parse_syllabus(pdf_path: str) -> Dict[str, str]:
-    # Open the syllabus PDF and extract full text
     with pdfplumber.open(pdf_path) as pdf:
-        text = "\n".join([page.extract_text() or "" for page in pdf.pages])
+        raw_text = "\n".join([page.extract_text() or "" for page in pdf.pages])
 
-    # Extract course name from the syllabus
-    course_name_match = re.search(r"Název (?:česky|v jazyce výuky):\s*(.+)", text)
-    course_name = course_name_match.group(1).strip() if course_name_match else ""
+    # Rekonstrukce typických nadpisů (vložíme zpět mezery a dvojtečky)
+    text = raw_text \
+        .replace("CoursetitleinEnglish", "Course title in English:") \
+        .replace("CoursetitleinCzech", "Course title in Czech:") \
+        .replace("Nameoflecturer(s)", "Name of lecturer(s):") \
+        .replace("Aimsofthecourse", "Aims of the course:") \
+        .replace("Learningoutcomesandcompetences", "Learning outcomes and competences:") \
+        .replace("Coursecontents", "Course contents:") \
+        .replace("Assessmentmethodsandcriteria", "Assessment methods and criteria:")
 
-    # Extract instructor(s) – includes multiline values until another section starts
-    instructor_match = re.findall(r"Vyučující:\s*((?:.+\n?)+?)(?:Omezení pro zápis|Doporučené doplňky kurzu|$)", text)
-    instructor = instructor_match[0].strip() if instructor_match else ""
+    # Helper funkce pro extrakci mezi dvěma sekcemi
+    def extract_between(start: str, end: str) -> str:
+        pattern = rf"{start}\s*(.*?)(?=\n\s*{end})"
+        match = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
+        return match.group(1).strip() if match else ""
 
-    # Extract learning outcomes (bullet-point style under a specific section)
-    learning_outcomes_match = re.search(r"Po úspěšném absolvování.*?\n((?:- .+\n)+)", text)
-    if learning_outcomes_match:
-        lines = learning_outcomes_match.group(1).strip().splitlines()
-        learning_outcomes = "\n".join(lines)
-    else:
-        learning_outcomes = ""
+    # Přímé extrakce
+    course_title = re.search(r"Course title in English:\s*(.*)", text)
+    lecturers = re.search(r"Name of lecturer\(s\):\s*(.*)", text)
 
-    # Extract grading method section 
-    grading_match = re.search(
-        r"Způsoby a kritéria hodnocení:.*?(Vypracování.*?Celkem\s+100\s*%)",
-        text, re.DOTALL
-    )
-    grading_method = grading_match.group(1).strip() if grading_match else ""
+    # Blokové extrakce
+    aims = extract_between("Aims of the course:", "Learning outcomes")
+    learning_outcomes = extract_between("Learning outcomes(?: and competences)?:", "Course contents")
+    course_contents = extract_between("Course contents:", "Learning activities")
+    if not course_contents:
+        course_contents = extract_between("Course contents:", "Assessment methods and criteria")
+    grading_method = extract_between("Assessment methods and criteria:", "Assessment:")
 
-    # Extract subject content (between section headers)
-    subject_content_match = re.search(r"Obsah předmětu:(.*?)Způsob studia", text, re.DOTALL)
-    subject_content = subject_content_match.group(1).strip() if subject_content_match else ""
-
-    # Return extracted fields as a dictionary
     return {
-        "course_name": course_name,
-        "instructor": instructor,
+        "course_name": course_title.group(1).strip() if course_title else "",
+        "lecturers": lecturers.group(1).strip() if lecturers else "",
+        "aims": aims,
         "learning_outcomes": learning_outcomes,
-        "grading_method": grading_method,
-        "subject_content": subject_content
+        "course_contents": course_contents,
+        "grading_method": grading_method
     }

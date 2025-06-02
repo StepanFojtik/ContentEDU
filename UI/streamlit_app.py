@@ -17,7 +17,8 @@ from course_pipeline import (
     generate_announcements_and_intro,
     retrieve_relevant_context,
     generate_final_parts,
-    generate_module
+    generate_module,
+    build_syllabus_text
 )
 
 # === UI title ===
@@ -80,29 +81,13 @@ if st.session_state.current_step == 1:
             with open(syllabus_path, "wb") as f:
                 f.write(uploaded_syllabus.getbuffer())
 
-            # Parse and reformat syllabus into Markdown-like structure
+            # Parse syllabus and convert to formatted text
             syllabus_info = parse_syllabus(syllabus_path)
-            syllabus_text = "\n".join([
-                "# Section – Introduction",
-                "",
-                "## Course Name",
-                syllabus_info['course_name'],
-                "",
-                "## Instructor(s)",
-                syllabus_info['instructor'],
-                "",
-                "## Learning Outcomes",
-                syllabus_info['learning_outcomes'],
-                "",
-                "## Grading Method",
-                syllabus_info['grading_method'],
-                "",
-                "## Course Content",
-                syllabus_info['subject_content'],
-                "",
-                "## Syllabus Link",
-                "(insert syllabus link here)"
-            ])
+            syllabus_text = build_syllabus_text(syllabus_info)
+
+            #odstranit ted pro debugging 
+            st.subheader("📝 Parsed Syllabus (for debugging)")
+            st.code(syllabus_text, language="markdown")
 
             # Embed and store all uploaded materials
             for path in material_paths:

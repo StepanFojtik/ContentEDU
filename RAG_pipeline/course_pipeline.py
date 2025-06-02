@@ -3,6 +3,7 @@
 # from teaching materials and syllabi using LLMs and LangGraph
 import os
 from typing import List
+from typing import Dict
 import re
 
 import pdfplumber
@@ -20,6 +21,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain_community.chat_models import ChatOpenAI
+
 
 # Load environment variables from .env file (e.g., API keys)
 load_dotenv()
@@ -55,6 +57,28 @@ def retrieve_relevant_context(syllabus_text: str, k: int = 5) -> str:
     retriever = vectorstore.as_retriever(search_kwargs={"k": k})
     docs = retriever.get_relevant_documents(syllabus_text)
     return "\n".join([doc.page_content for doc in docs])
+
+# Build syllabus text from parsed data
+def build_syllabus_text(info: Dict[str, str]) -> str:
+    return f"""
+# Course Title
+{info.get("course_name", "")}
+
+## Lecturers
+{info.get("lecturers", "")}
+
+## Aims of the Course
+{info.get("aims", "")}
+
+## Learning Outcomes and Competences
+{info.get("learning_outcomes", "")}
+
+## Course Contents
+{info.get("course_contents", "")}
+
+## Assessment Methods and Criteria
+{info.get("grading_method", "")}
+""".strip()
 
 # === Prompt-based generation functions ===
 # These functions use prompt templates and LLMs to generate different parts of the course
