@@ -85,10 +85,6 @@ if st.session_state.current_step == 1:
             syllabus_info = parse_syllabus(syllabus_path)
             syllabus_text = build_syllabus_text(syllabus_info)
 
-            #odstranit ted pro debugging 
-            st.subheader("📝 Parsed Syllabus (for debugging)")
-            st.code(syllabus_text, language="markdown")
-
             # Embed and store all uploaded materials
             for path in material_paths:
                 text = extract_text_from_pdf(path)

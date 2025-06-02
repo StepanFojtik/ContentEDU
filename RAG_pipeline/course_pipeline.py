@@ -59,25 +59,14 @@ def retrieve_relevant_context(syllabus_text: str, k: int = 5) -> str:
     return "\n".join([doc.page_content for doc in docs])
 
 # Build syllabus text from parsed data
-def build_syllabus_text(info: Dict[str, str]) -> str:
+def build_syllabus_text(info: dict) -> str:
     return f"""
-# Course Title
-{info.get("course_name", "")}
-
-## Lecturers
-{info.get("lecturers", "")}
-
-## Aims of the Course
-{info.get("aims", "")}
-
-## Learning Outcomes and Competences
-{info.get("learning_outcomes", "")}
-
-## Course Contents
-{info.get("course_contents", "")}
-
-## Assessment Methods and Criteria
-{info.get("grading_method", "")}
+Course title in English: {info.get("course_name", "").strip()}
+Name of lecturer(s): {info.get("lecturers", "").strip()}
+Aims of the course: {info.get("aims", "").strip()}
+Learning outcomes and competences: {info.get("learning_outcomes", "").strip()}
+Course contents: {info.get("course_contents", "").strip()}
+Assessment methods and criteria: {info.get("grading_method", "").strip()}
 """.strip()
 
 # === Prompt-based generation functions ===
