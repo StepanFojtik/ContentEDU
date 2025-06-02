@@ -115,7 +115,10 @@ elif st.session_state.current_step == 2:
     if st.button("🚀 Generate Structure", key="step2_generate"):
         with st.spinner("Generating course structure..."):
             # Call LLM to generate structure from syllabus
-            structure = generate_structure(st.session_state.syllabus_text)
+            structure = generate_structure(
+                syllabus_text=st.session_state.syllabus_text,
+                context=st.session_state.context
+            )
 
             # Store result and proceed to the next step
             st.session_state.structure = structure

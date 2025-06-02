@@ -79,7 +79,7 @@ def load_prompt(filename: str) -> str:
         return f.read()
     
 # Generate the course structure based on the syllabus
-def generate_structure(syllabus_text: str) -> dict:
+def generate_structure(syllabus_text: str, context: str = "") -> dict:
     prompt_template = load_prompt("course_structure_prompt.txt")
     system_prompt = load_prompt("system_prompt.txt")
 
@@ -87,8 +87,11 @@ def generate_structure(syllabus_text: str) -> dict:
     llm = ChatOpenAI(openai_api_key=API_KEY, model="gpt-4-1106-preview").with_config({"system_message": system_prompt})
     chain = LLMChain(llm=llm, prompt=prompt)
 
-    output = chain.run({"syllabus_text": syllabus_text})
-    return {"text": output} 
+    output = chain.run({
+        "syllabus_text": syllabus_text,
+        "context": context  
+    })
+    return {"text": output}
 
 # Generate the Announcements and Introduction sections based on the syllabus and context
 def generate_announcements_and_intro(syllabus_text: str, context: str, structure_text: str = "") -> str:
@@ -158,7 +161,10 @@ def node_retrieve_context(state):
 
 # Generate the overall structure of the course from the syllabus
 def node_generate_structure(state):
-    structure = generate_structure(state["syllabus_text"])
+    structure = generate_structure(
+        syllabus_text=state["syllabus_text"],
+        context=state["context"]
+    )
     return {**state, "structure": structure}
 
 # Generate Announcements and Introduction sections
