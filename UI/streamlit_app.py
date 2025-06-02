@@ -60,7 +60,7 @@ if st.session_state.current_step == 1:
 
     # Upload multiple teaching materials (PDFs) and one syllabus
     uploaded_materials = st.file_uploader("Upload teaching materials (multiple PDFs)", type="pdf", accept_multiple_files=True)
-    uploaded_syllabus = st.file_uploader("Upload syllabus (PDF)", type="pdf")
+    uploaded_syllabus = st.file_uploader("Upload syllabus (.rtf only)", type="rtf")
     course_name = st.text_input("Course name", value=st.session_state.course_name)
 
     # Continue only if all inputs are filled
