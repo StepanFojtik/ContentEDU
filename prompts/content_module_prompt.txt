@@ -22,7 +22,14 @@ Do not include any heading such as “Educational Content” in the output.
 4. **Summary**  
 Include a short paragraph summarizing the key points of the module.
 
-5. **Self-Check Quiz**  
+5. **Suggested Multimedia Enhancements**  
+Recommend 2–3 types of multimedia or interactive elements (e.g., infographic, screencast, animation, video interview, concept map).  
+For each, explain:
+- What kind of media it is
+- What it would show or explain
+- Why it would be helpful for the student’s understanding
+
+6. **Self-Check Quiz**  
 Create a short quiz (4–6 questions) that allows students to reflect on and review the material.  
 This quiz is for self-assessment only – do not refer to it as a “test”.
 
