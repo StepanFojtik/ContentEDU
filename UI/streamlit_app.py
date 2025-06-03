@@ -105,15 +105,15 @@ if st.session_state.current_step == 1:
         else:
             st.warning("Please upload all required files and enter course name.")
 
-# === Step 2: Generate course structure ===
+# === Step 2: Generate digital course structure ===
 # Uses the parsed syllabus text to generate a proposed course structure
 # The structure includes section/module titles and short descriptions
 
 elif st.session_state.current_step == 2:
-    st.header("📑 Step 2: Generate course structure")
+    st.header("📑 Step 2: Generate digital course structure")
 
     if st.button("🚀 Generate Structure", key="step2_generate"):
-        with st.spinner("Generating course structure..."):
+        with st.spinner("Generating digital course structure..."):
             # Call LLM to generate structure from syllabus
             structure = generate_structure(
                 syllabus_text=st.session_state.syllabus_text,
@@ -131,7 +131,7 @@ elif st.session_state.current_step == 2:
 # If approved, the app extracts module topics and retrieves relevant content from uploaded materials
 
 elif st.session_state.current_step == 3:
-    st.header("📋 Step 3: Review course structure")
+    st.header("📋 Step 3: Review digital course structure")
 
     if st.session_state.structure:
         # Display suggested structure to the user

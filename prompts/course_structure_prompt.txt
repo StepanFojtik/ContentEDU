@@ -25,8 +25,9 @@ Your task is to propose a full, numbered structure for the course using the foll
 
 This section introduces students to the structure of the course, learning goals, who teaches the course, how it will be evaluated, and what they can expect from each part of the course. It sets expectations and explains how the course is organized.
 
-3. Focus especially on the content modules. Use the section *"Course contents"* or a similar part of the syllabus to design a logical sequence of topics. You may group related themes together if appropriate. Module titles should be descriptive and reflect the actual content of the module. You may also use relevant supporting materials provided from teaching documents (e.g., lecture slides or readings) to enrich the module descriptions, as long as the content is consistent with the syllabus.
+2b. Always place a blank line between the title and the paragraph description. Do not place the text directly after the title on the same line.
 
+3. Focus especially on the content modules. Use the section *"Course contents"* or a similar part of the syllabus to design a logical sequence of topics. You may group related themes together if appropriate. Module titles should be descriptive and reflect the actual content of the module. You may also use relevant supporting materials provided from teaching documents (e.g., lecture slides or readings) to enrich the module descriptions, as long as the content is consistent with the syllabus.
 
 4. Do not write or generate actual course content — just the structure with titles and descriptions.
 
