@@ -4,14 +4,23 @@ General rules:
 - Each quiz must include both the questions and the answer options.
 - Clearly mark the correct answer(s) for each question.
 - Do not refer to the quiz as a "test" or "exam" – it is for self-assessment only.
-- In regular content modules, quiz questions must be based solely on the content of that specific module.
-- In introductory or final quizzes, questions should reflect the full course structure and content.
-- Do not write the question type at the beginning of the question.
-- Instead, after the correct answer(s), include the question type on a new line in *italic*, using one of the following:
-  - *Type: Single Correct Answer*
-  - *Type: True/False*
-  - *Type: Multiple Correct Answers*
-- Do not use bold formatting for question types.
+- In regular content modules, quiz questions must be based solely on the learning content of that specific module.
+- In introductory or final quizzes, questions may draw on the overall course objectives, structure, and module topics.
+
+General formatting rules for all questions:
+- Formatting is critical. Follow all line breaks and structure exactly as described
+- Number each quiz item using 1., 2., 3., etc.
+- Do NOT write "Question:" or "Statement:" before the actual text.
+- Put the full question text on its own line.
+- Then, list the answer options each on a new line, using the format:
+  A) ...
+  B) ...
+  C) ...
+  D) ...
+- After the answer options, add a blank line.
+- On a new line, write the correct answer like this: *Correct answer: B*
+- On the next line, write the question type like this: *Type: Single Correct Answer*
+- Do not combine the correct answer or type with any other text or line.
 
 Use only the following three question types:
 
@@ -22,7 +31,7 @@ Single Correct Answer
 - Only one option is correct.
 - Format:
 
-  Question: What is the primary goal of impact evaluation?  
+  1. What is the primary goal of impact evaluation?  
   A) To reduce the cost of a program  
   B) To determine causal effects  
   C) To identify program participants  
@@ -36,7 +45,7 @@ True/False
 - Provide a statement and specify whether it is *True* or *False*.
 - Format:
 
-  Statement: Evidence-based policy making relies exclusively on expert opinion.  
+  2. Evidence-based policy making relies exclusively on expert opinion.  
   *Answer: False*  
   *Type: True/False*
 
@@ -49,7 +58,7 @@ Multiple Correct Answers
 - Explicitly list all correct answers.
 - Format:
 
-  Question: Which of the following are methods of causal inference? (Select all that apply)  
+  3. Which of the following are methods of causal inference? (Select all that apply)  
   A) Randomized Controlled Trials  
   B) Descriptive Statistics  
   C) Difference-in-Differences  

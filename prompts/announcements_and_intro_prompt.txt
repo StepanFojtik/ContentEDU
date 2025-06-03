@@ -49,7 +49,19 @@ Example:
 2. [Module 2 title]  
 3. [Module 3 title]  
 ...
+
 Each module contains educational content and a self-check quiz. The course ends with a final quiz and a conclusion.
 
 ## Legal Notice  
 All materials included in this course – including photographs, images, and video clips – are protected by copyright. Their use is permitted for personal study purposes only. According to §30 of the Czech Copyright Act, any reproduction, duplication, or imitation of these materials for personal use is allowed, but further distribution or public sharing is prohibited.
+
+## Self-check Quiz  
+At the end of the introduction, include a short quiz to help students reflect on the general topics covered in this course.
+
+- Create one simple, content-related question for each module in the course.  
+- The questions should test basic awareness of the concepts, terminology, or themes associated with each module.  
+- Do not go into technical depth or require prior detailed knowledge.  
+- Base the questions on the module titles and the overall course theme.  
+- Follow the formatting rules from the separate quiz format prompt.  
+- Label this section as “Self-check Quiz”.  
+- Do not refer to this as a test or exam.

@@ -23,7 +23,7 @@ Your task is to propose a full, numbered structure for the course using the foll
 
 2a. Use the following fixed description for "Section – Introduction":
 
-This section introduces students to the structure of the course, learning goals, who teaches the course, how it will be evaluated, and what they can expect from each part of the course. It sets expectations and explains how the course is organized.
+This section introduces students to the structure of the course, learning goals, who teaches the course, how it will be evaluated, and what they can expect from each part of the course. It sets expectations and explains how the course is organized. This section also includes a short self-check quiz to help students reflect on the main topics of the course.
 
 2b. Always place a blank line between the title and the paragraph description. Do not place the text directly after the title on the same line.
 
