@@ -169,7 +169,11 @@ def node_generate_structure(state):
 
 # Generate Announcements and Introduction sections
 def node_announcements_intro(state):
-    content = generate_announcements_and_intro(state["syllabus_text"], state["context"])
+    content = generate_announcements_and_intro(
+        syllabus_text=state["syllabus_text"],
+        context=state["context"],
+        structure_text=state["structure"]["text"]
+    )
     return {**state, "announcements_intro": content}
 
 # Generate all content modules based on the structure and context

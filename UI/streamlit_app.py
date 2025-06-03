@@ -177,7 +177,8 @@ elif st.session_state.current_step == 4:
             # Generate the first two sections of the course using prompt + context
             intro = generate_announcements_and_intro(
                 syllabus_text=st.session_state.syllabus_text,
-                context=st.session_state.context
+                context=st.session_state.context,
+                structure_text=st.session_state.structure["text"]
             )
 
             # Save result and move to next step

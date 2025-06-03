@@ -1,50 +1,55 @@
 You are tasked with generating the first two sections of a Moodle-based digital university course: Announcements and Introduction.
 
-Below is the official course syllabus in Czech. Use it as the only source of truth. Do not invent any content. If an item is not present, write: "Information not found in syllabus."
+You will be provided with two inputs:
+– the course syllabus (in English), which contains the official course description and key teaching information,
+– and the AI-generated structure of the course, which outlines how the course is organized.
+
+Use these materials as your main references. If specific information is missing from both, write: "Information not found."
 
 ---
 SYLLABUS:
 {syllabus_text}
 ---
 
-1. Section – Announcements  
+STRUCTURE:
+{structure_text}
+
+---
+
+# Section – Announcements  
 Always include this section first. Its content must remain empty except for the following instructor note (write it as plain paragraph text, not italicized or Markdown):
 
 (This section is intended for communication with students during the semester. We recommend posting organizational updates and important announcements here.)
 
-2. Section – Introduction  
-Use the provided syllabus to extract and present the following items.
+# Section – Introduction  
+This section is visible to students. Use the following Markdown format to present clearly structured information:
 
-For each item:
-- If the information is found in the syllabus, present it.
-- If not found, write: Information not found in syllabus.
-
-Items to extract:
-- Course name – from “Název předmětu”
-- Instructor(s) – extract *all* names from “Vyučující” section. If multiple are listed, include them all.
-- Learning outcomes – from “Výsledky učení” or similar section
-- Grading method – from “Způsoby a kritéria hodnocení”
-- Syllabus link – always use the placeholder (insert syllabus link here)
-- Course structure – summarize from the AI-generated structure or “Obsah předmětu”
-
-Use the following Markdown format:
-
-# Section – Introduction
-
-## Course Name  
-[actual content or: Information not found in syllabus.]
+## About the Course  
+Write a short paragraph explaining the main purpose, scope, and relevance of the course. Use the “Aims of the course” section to summarize what the course is about and what topics or methods are emphasized.
 
 ## Instructor(s)  
-[actual content or: Information not found in syllabus.]
+Extract all listed names from “Name of lecturer(s)”.
 
 ## Learning Outcomes  
-[actual content or: Information not found in syllabus.]
+List each learning outcome from the syllabus as a bullet point. Precede the list with the sentence: "By the end of this course, students will be able to:"
 
 ## Grading Method  
-[actual content or: Information not found in syllabus.]
+Use the “Assessment methods and criteria” section to generate a clean and readable grading breakdown. Present each component on a separate line in this format:  
+- Component: Percentage  
+Do not include items like “Daily attendance” if they are not part of the actual grading.
 
 ## Syllabus Link  
 (insert syllabus link here)
 
-## Course Structure  
-[actual content or: Information not found in syllabus.]
+## Course Organization  
+Use the provided STRUCTURE input to extract the module titles and summarize how the course is organized. Present the module titles as a numbered list.  
+Example:  
+"The course is organized into several modules:"  
+1. [Module 1 title]  
+2. [Module 2 title]  
+3. [Module 3 title]  
+...
+Each module contains educational content and a self-check quiz. The course ends with a final quiz and a conclusion.
+
+## Legal Notice  
+All materials included in this course – including photographs, images, and video clips – are protected by copyright. Their use is permitted for personal study purposes only. According to §30 of the Czech Copyright Act, any reproduction, duplication, or imitation of these materials for personal use is allowed, but further distribution or public sharing is prohibited.
