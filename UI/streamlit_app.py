@@ -218,54 +218,70 @@ elif st.session_state.current_step == 5:
 elif st.session_state.current_step == 6:
     st.header("📦 Step 6: Generate Modules")
 
-    # Safety check – module topics must exist
     if not st.session_state.module_topics:
         st.error("❌ Module topics not loaded. Please restart from Step 1.")
         st.stop()
-    
+
     topics = st.session_state.module_topics
     idx = st.session_state.current_module_idx
+    topic_in_progress = topics[idx]
 
-    if idx < len(topics):
-        topic = topics[idx]
-        st.subheader(f"📘 Module {idx + 1} – {topic}")
+    # Initialize modules_dict if needed
+    if "modules_dict" not in st.session_state:
+        st.session_state.modules_dict = {}
 
-        # Generate current module content (if not already generated)
-        if st.session_state.current_module_content is None:
-            with st.spinner("Generating module content..."):
-                content = generate_module(idx + 1, topic, st.session_state.context)
-                st.session_state.current_module_content = content
-        
-        # Display generated content
-        st.markdown(st.session_state.current_module_content)
+    # Determine which module is selected for viewing
+    selected_topic = topic_in_progress  # default
+    if "view_module_topic" in st.session_state:
+        selected_topic = st.session_state.view_module_topic
 
-        col1, col2 = st.columns(2)
+    # DEBUG: you can remove these
+    # st.write("Selected:", selected_topic)
+    # st.write("In progress:", topic_in_progress)
 
-        with col1:
-            # Approve current module and move to the next one
-            if st.button("✅ Approve this module", key=f"step6_approve_{idx}"):
-                st.session_state.modules.append(st.session_state.current_module_content)
-                st.session_state.current_module_idx += 1
-                st.session_state.current_module_content = None  # Reset for next module
-                
-                # If this was the last module, proceed to final part
-                if st.session_state.current_module_idx >= len(topics):
-                    st.session_state.step = 7
-                    st.session_state.current_step = 7
-                st.rerun()
-                
-        with col2:
-            # Regenerate current module
-            if st.button("🔁 Regenerate this module", key=f"step6_regenerate_{idx}"):
-                st.session_state.current_module_content = None
-                st.rerun()
+    # If user selected a previously approved module → show read-only
+    if selected_topic != topic_in_progress:
+        if selected_topic in st.session_state.modules_dict:
+            st.markdown("---")
+            st.info(f"👀 You are viewing approved **{selected_topic}**")
+            st.markdown(st.session_state.modules_dict[selected_topic])
+            st.markdown("---")
+        else:
+            st.warning("⚠️ This module is not yet available.")
+        st.stop()
 
-    else:
-        # All modules have been approved
-        st.success("✅ All modules approved. Moving to final part.")
-        st.session_state.step = 7
-        st.session_state.current_step = 7
-        st.rerun()
+    # === Display active module ===
+    st.subheader(f"📘 Module {idx + 1} – {topic_in_progress}")
+
+    if st.session_state.current_module_content is None:
+        with st.spinner("Generating module content..."):
+            content = generate_module(idx + 1, topic_in_progress, st.session_state.context)
+            st.session_state.current_module_content = content
+
+    st.markdown(st.session_state.current_module_content)
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if st.button("✅ Approve this module", key=f"approve_{idx}"):
+            st.session_state.modules_dict[topic_in_progress] = st.session_state.current_module_content
+            st.session_state.current_module_idx += 1
+            st.session_state.current_module_content = None
+
+            # ❗ clear selection to avoid fallback to previous module
+            if "view_module_topic" in st.session_state:
+                del st.session_state.view_module_topic
+
+            if st.session_state.current_module_idx >= len(topics):
+                st.session_state.step = 7
+                st.session_state.current_step = 7
+
+            st.rerun()
+
+    with col2:
+        if st.button("🔁 Regenerate this module", key=f"regen_{idx}"):
+            st.session_state.current_module_content = None
+            st.rerun()
 
 # === Step 7: Generate final quiz and conclusion ===
 # Uses the syllabus, course structure, and all approved modules to generate:
@@ -331,9 +347,6 @@ elif st.session_state.current_step == 8:
                 )
 
 # === Sidebar: step navigation ===
-# Sidebar allows users to navigate between available steps in the app
-# Step switching works independently of main button logic (placed at the end intentionally)
-
 st.sidebar.title("📋 Steps")
 
 # Mapping internal step numbers to readable labels
@@ -351,15 +364,45 @@ steps_labels = {
 # Only display steps that have already been unlocked by the user
 available_steps = [i for i in range(1, st.session_state.step + 1)]
 
-# Render the sidebar radio button for navigation
+# Step selection
 selected_step = st.sidebar.radio(
     "Go to step:", 
     available_steps, 
     format_func=lambda x: steps_labels[x],
-    index=available_steps.index(st.session_state.current_step) if st.session_state.current_step in available_steps else 0
+    index=available_steps.index(st.session_state.current_step) if st.session_state.current_step in available_steps else 0,
+    key="step_selector"
 )
 
-# Update visible step only if user selects a different one
 if selected_step != st.session_state.current_step:
     st.session_state.current_step = selected_step
     st.rerun()
+
+# === Module selector (only visible from step 6 onwards) ===
+if st.session_state.step >= 6 and st.session_state.module_topics:
+    st.sidebar.markdown("#### 📦 Modules")
+
+    topics = st.session_state.module_topics
+    current_idx = st.session_state.current_module_idx
+
+    module_labels = {}
+    for i, topic in enumerate(topics):
+        if i < current_idx:
+            module_labels[topic] = f"Module {i + 1} – {topic}"
+        elif i == current_idx:
+            module_labels[topic] = f"(in progress) Module {i + 1} – {topic}"
+        else:
+            break  # don’t show future
+
+    visible_topics = list(module_labels.keys())
+
+    selected = st.sidebar.radio(
+        "Select a module to view:",
+        options=visible_topics,
+        format_func=lambda topic: module_labels[topic],
+        index=visible_topics.index(topics[current_idx]),
+        key="module_selector"
+    )
+
+    st.session_state.view_module_topic = selected
+
+
