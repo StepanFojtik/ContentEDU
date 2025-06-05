@@ -3,6 +3,7 @@ import sys
 import streamlit as st
 import pdfplumber
 import re
+from html import escape
 
 # Add the RAG_pipeline folder to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "RAG_pipeline")))
@@ -18,7 +19,8 @@ from course_pipeline import (
     retrieve_relevant_context,
     generate_final_parts,
     generate_module,
-    build_syllabus_text
+    build_syllabus_text,
+    markdown_to_html
 )
 
 # === UI title ===
@@ -301,32 +303,66 @@ elif st.session_state.current_step == 8:
         # Display the generated final part
         st.markdown(st.session_state.final_parts)
 
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
 
         with col1:
             # Final confirmation (no action, just visual feedback)
             if st.button("✅ Approve Final Part", key="step8_approve"):
                 st.success("🎉 Course generation complete!")
-
+        
         with col2:
-            # Export the full course as a downloadable HTML file
-            if st.button("⬇️ Export to HTML", key="step8_export"):
-                html_content = "<html><head><meta charset='UTF-8'><title>Course Export</title></head><body>"
-                html_content += "<h1>Announcements + Introduction</h1>"
-                html_content += f"<div>{st.session_state.announcements_intro}</div>"
+            # .txt dowload
+            if st.button("⬇️ Export to .txt", key="step8_export"):
+                full_txt_course = (
+                    f"{st.session_state.announcements_intro}\n\n"
+                    + "\n\n".join(st.session_state.modules)
+                    + f"\n\n{st.session_state.final_parts}"
+                )
+                st.download_button(
+                    label="Download as .txt",
+                    data=full_txt_course,
+                    file_name="moodle_course.txt",
+                    mime="text"
+                )
 
-                html_content += "<h1>Modules</h1>"
-                for i, module in enumerate(st.session_state.modules):
-                    html_content += f"<h2>Module {i + 1}</h2><div>{module}</div>"
+        with col3:
+            # HTML download
+            if st.button("⬇️ Export to HTML", key="step9_export"):
+                full_course = (
+                    f"{st.session_state.announcements_intro}\n\n"
+                    + "\n\n".join(st.session_state.modules)
+                    + f"\n\n{st.session_state.final_parts}"
+                )
 
-                html_content += "<h1>Final Part</h1>"
-                html_content += f"<div>{st.session_state.final_parts}</div>"
-                html_content += "</body></html>"
+                html_course = f"""
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>{escape(st.session_state.course_name)}</title>
+                    <style>
+                        body {{ font-family: Arial, sans-serif; line-height: 1.6; margin: 40px; }}
+                        h1, h2, h3 {{ color: #003366; }}
+                        ul {{ margin-left: 20px; }}
+                        hr {{ margin: 30px 0; }}
+                    </style>
+                </head>
+                <body>
+                    <h1>{escape(st.session_state.course_name)}</h1>
+                    {markdown_to_html(st.session_state.announcements_intro)}<hr>
+                    {''.join(
+                        f"<h2>Module {i+1}</h2>{markdown_to_html(mod)}<hr>"
+                        for i, mod in enumerate(st.session_state.modules)
+                    )}
+                    <h2>Conclusion</h2>
+                    {markdown_to_html(st.session_state.final_parts)}
+                </body>
+                </html>
+                """
 
                 st.download_button(
-                    label="Download HTML file",
-                    data=html_content,
-                    file_name="course_export.html",
+                    label="Download as HTML",
+                    data=html_course,
+                    file_name="moodle_course.html",
                     mime="text/html"
                 )
 

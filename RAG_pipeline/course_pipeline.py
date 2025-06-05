@@ -21,7 +21,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain_community.chat_models import ChatOpenAI
-
+from html import escape
 
 # Load environment variables from .env file (e.g., API keys)
 load_dotenv()
@@ -207,6 +207,19 @@ def node_qa_check(state):
     ])
     qa_result = "(QA agent is currently disabled)"
     return {**state, "full_draft": full_draft, "qa_result": qa_result}
+
+# Make better HTML document outcome (visual)
+def markdown_to_html(md_text):
+    html = md_text
+    html = re.sub(r'^# (.*?)$', r'<h1>\1</h1>', html, flags=re.MULTILINE)
+    html = re.sub(r'^## (.*?)$', r'<h2>\1</h2>', html, flags=re.MULTILINE)
+    html = re.sub(r'^### (.*?)$', r'<h3>\1</h3>', html, flags=re.MULTILINE)
+    html = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', html)
+    html = re.sub(r'\*(.*?)\*', r'<em>\1</em>', html)
+    html = re.sub(r'^- (.*?)$', r'<li>\1</li>', html, flags=re.MULTILINE)
+    html = re.sub(r'((<li>.*?</li>\s*)+)', r'<ul>\1</ul>', html, flags=re.DOTALL)
+    html = html.replace("\n", "<br>")
+    return html
 
 # === LangGraph definition ===
 # Defines the full pipeline structure and transitions between steps
