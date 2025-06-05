@@ -1,6 +1,6 @@
-You are tasked with generating a structured content module for a Moodle-based university course.
+You are tasked with generating a structured content module for a university Moodle course.
 
-Each content module represents one of the main instructional units of the course. It should contain the full educational content that helps students understand the topic and prepare for exams or assignments. The output must be suitable as a standalone learning resource.
+Each module must serve as a **standalone educational resource**, suitable for independent student learning. The content should be written in a clear, connected and natural style, following basic pedagogical principles.
 
 Each module must include the following elements:
 
@@ -9,32 +9,44 @@ Use the format: *Module X – [Descriptive Title]*
 (Replace X with the appropriate module number.)
 
 2. **Learning Objectives**  
-List 2–4 concise bullet points describing what the student should be able to do or understand after completing the module.
+List 2–4 learning objectives that describe what the student will be able to do after completing this module. Use active verbs from Bloom’s taxonomy (e.g., describe, apply, compare, evaluate).
 
-3. **Educational Content**  
-After the Learning Objectives section, write the core instructional content of the module.
-Structure the content into sections using `##` level subheadings (e.g., `## Introduction`, `## Key Methods`, `## Case Examples`).  
-Explain concepts step by step, define key terms, and use examples or analogies where appropriate.  
-The content should be complete enough for a student to study the topic independently and understand it well enough to succeed in course assessments.  
-Avoid excessive technical jargon, but do not oversimplify.  
-Do not include any heading such as “Educational Content” in the output.
+3. **Module Content**  
+This is the main instructional text. It must be written as a **coherent and continuous narrative**, not as a list or slide deck.  
+Use clear paragraphs, informative subheadings (using `##`), and pedagogically meaningful transitions.
 
-4. **Summary**  
-Include a short paragraph summarizing the key points of the module.
+Requirements:
+- Focus on explaining the topic clearly and in depth.
+- Do not use generic section titles like “Key Concepts” or “Educational Content”.
+- Subheadings should reflect the actual content (e.g., `## How this method works`, `## Common mistakes`, `## Practical use in health policy`).
+- Where appropriate, include examples or short illustrations, **only if they follow naturally from the topic**.
+- Do not include instructional verbs like “Define...” or “Explain...” in the output.
+- Aim for natural academic language and flow, not bullet points.
+- Target university-level depth (Bachelor or Master), with a minimum of 500–700 words.
+
+4. **Suggested Multimedia Enhancements**    
+
+Suggest 2–3 optional multimedia elements (e.g., infographic, screencast, short video interview).  
+At least one of them should aim to show how the topic is applied in a real-world context.
+
+For each:
+- Indicate what type of media it is  
+- What it would show or explain  
+- How it helps students understand the topic more effectively
 
 5. **Self-Check Quiz**  
-Create a short quiz (4–6 questions) that allows students to reflect on and review the material.  
-This quiz is for self-assessment only – do not refer to it as a “test”.
+Provide a quiz with 4–6 questions to help students review key points.
 
-- Do not state the question type before the question.  
-- After each *Correct answer* or *Correct answers* line, add a new line indicating the question type in *italic*, e.g., *Type: Single Correct Answer*.  
-- Do not use bold formatting for question types.  
-- Use the standard formats and examples defined in the separate quiz format prompt.
+- Do not indicate the question type before the question.
+- After each *Correct answer* or *Correct answers* line, add a line in *italic* that states the type (e.g., *Type: Multiple Correct Answers*).
+- Use a mix of formats: single correct, multiple correct, true/false, and short answer.
+- All questions must be clearly based on this module’s content only.
 
 Guidelines:
-- Use only the information provided in the syllabus or input materials.
-- Do not include citations, references, system notes, or motivational commentary.
-- The quiz questions must only refer to content from this specific module.
+- Focus on clarity, structure, and educational value.
+- Do not invent content outside the provided topic and context.
+- Do not repeat or summarize the entire module in a closing paragraph.
+- Do not include formatting placeholders like “Educational Content” or “Summary”.
 
-Provided topic for this module:
+Provided topic for this module:  
 [CONTENT_TOPIC_HERE]
