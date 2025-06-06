@@ -44,8 +44,3 @@ SYLLABUS:
 
 SUPPORTING MATERIALS:
 {context}
-
-
-
-
-
