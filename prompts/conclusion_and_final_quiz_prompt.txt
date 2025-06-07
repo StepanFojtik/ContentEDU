@@ -17,25 +17,33 @@ Instructions:
 ---
 
 2. **Section – Conclusion**  
-This section provides a final message to students and concludes the course.
+This section concludes the course and contains the following three elements:
 
-Include the following:
-- A short summary of what the course has covered
-- A brief explanation of how the course ends (e.g., final project, oral exam)
-- A note inviting students to give feedback on the course
+**Course Summary**  
+Write a short pedagogical summary of what the course has covered.  
+- Summarize the main topics and methods taught.  
+- Highlight what knowledge and skills students have acquired.  
+- Keep the tone academic but encouraging.  
+- Do not include administrative or exam-related information.
 
-Guidelines:
-- Use only the information from the syllabus or provided materials
-- If key information is missing (e.g., final exam format), clearly state that
-- Keep the tone academic but encouraging
-- Do not invent details or include implementation notes
+**Course Completion**  
+Insert the following placeholder text:
 
-The output should include both sections in the correct order, using Markdown formatting with clear section titles.
+This section requires manual completion by the course instructor.
+
+According to the official FIS methodology, it is recommended to include:
+- The type and format of final assessment (e.g., written exam, oral exam, project defense)
+- Date and location (or a link to INSIS for official registration)
+- Minimum passing requirements (e.g., number of points)
+- Any additional instructions for students
+- Optional: sample test or template
+
+Please insert this information clearly for students to prepare for the final assessment.
 
 ---
 
-Content from the course modules:
+Content from the course modules:  
 {modules_text}
 
-Syllabus reference (if needed):
+Syllabus reference (if needed):  
 {syllabus_text}
