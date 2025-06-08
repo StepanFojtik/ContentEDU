@@ -29,6 +29,7 @@ Write a short paragraph explaining the main purpose, scope, and relevance of the
 
 ## Instructor(s)  
 Extract all listed names from “Name of lecturer(s)”.
+[Link to instructor's profile] ← (Please insert the link to the instructor’s public profile in InSIS so that students can check contact details and consultation hours.)
 
 ## Learning Outcomes  
 List each learning outcome from the syllabus as a bullet point. Precede the list with the sentence: "By the end of this course, students will be able to:"
@@ -50,7 +51,11 @@ Example:
 3. [Module 3 title]  
 ...
 
-Each module contains educational content and a self-check quiz. The course ends with a final quiz and a conclusion.
+Each module contains educational content and a self-check quiz. All quizzes in this digital course are designed for self-assessment only and are not graded.
+
+The course concludes with a final quiz and a summary.  
+
+(Please add brief information here about when and where in-person teaching takes place, if applicable (e.g., weekly schedule, classroom, etc.).)
 
 ## Legal Notice  
 All materials included in this course – including photographs, images, and video clips – are protected by copyright. Their use is permitted for personal study purposes only. According to §30 of the Czech Copyright Act, any reproduction, duplication, or imitation of these materials for personal use is allowed, but further distribution or public sharing is prohibited.
