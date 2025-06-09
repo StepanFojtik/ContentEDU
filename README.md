@@ -43,7 +43,8 @@ streamlit run UI/streamlit_app.py
 
 ```
 .
-├── streamlit_app.py          main frontend (Streamlit)
+├── UI/
+│   └── streamlit_app.py      main frontend (Streamlit)
 ├── RAG_pipeline/
 │   ├── course_pipeline.py    backend logic (LangGraph + LangChain)
 │   └── syllabus_parser.py    syllabus (.rtf) processing
